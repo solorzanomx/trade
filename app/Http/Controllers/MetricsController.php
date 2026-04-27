@@ -47,6 +47,7 @@ class MetricsController extends Controller
         $losses = $allClosedTrades->filter(fn($t) => $t->p_l < 0);
         $totalPnL = $allClosedTrades->sum('p_l');
 
+        $totalCommission = $allClosedTrades->sum('commission');
         $stats = [
             'total_trades' => $allClosedTrades->count(),
             'wins' => $wins->count(),
@@ -55,6 +56,8 @@ class MetricsController extends Controller
             'total_pnl' => round($totalPnL, 2),
             'avg_win' => $wins->isNotEmpty() ? round($wins->sum('p_l') / $wins->count(), 2) : 0,
             'avg_loss' => $losses->isNotEmpty() ? round($losses->sum('p_l') / $losses->count(), 2) : 0,
+            'total_commission' => round($totalCommission, 2),
+            'net_pnl' => round($totalPnL - $totalCommission, 2),
         ];
 
         // Monthly breakdown

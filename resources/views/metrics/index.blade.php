@@ -1,58 +1,63 @@
 @extends('layouts.app')
-
-@section('title', 'Metrics - Trading Journal')
+@section('title', 'Métricas - TradeLog')
 
 @section('content')
 <div id="app">
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold">Performance Metrics</h1>
-    </div>
-
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Total Trades</div>
-        <div class="text-3xl font-bold">{{ $stats['total_trades'] }}</div>
-    </div>
-
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Wins</div>
-        <div class="text-3xl font-bold text-green-600">{{ $stats['wins'] }}</div>
-    </div>
-
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Losses</div>
-        <div class="text-3xl font-bold text-red-600">{{ $stats['losses'] }}</div>
-    </div>
-
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Win Rate</div>
-        <div class="text-3xl font-bold">{{ number_format($stats['win_rate'], 1) }}%</div>
-    </div>
-
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Total P&L</div>
-        <div class="text-3xl font-bold {{ $stats['total_pnl'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
-            ${{ number_format($stats['total_pnl'], 2) }}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <div>
+            <h1>Métricas de Rendimiento</h1>
+            <div class="text-muted" style="font-size:13px; margin-top:2px;">Análisis de tus operaciones</div>
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Avg Win</div>
-        <div class="text-3xl font-bold text-green-600">
-            ${{ number_format($stats['avg_win'], 2) }}
+    <!-- Stats Cards -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;">
+        <div class="card" style="padding:20px;">
+            <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Total Operaciones</div>
+            <div style="font-size:28px; font-weight:800; color:#fff;">{{ $stats['total_trades'] }}</div>
         </div>
+        <div class="card" style="padding:20px;">
+            <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Ganadoras / Perdedoras</div>
+            <div style="font-size:28px; font-weight:800;">
+                <span style="color:var(--green);">{{ $stats['wins'] }}</span>
+                <span style="color:var(--text-muted); font-size:18px;"> / </span>
+                <span style="color:var(--red);">{{ $stats['losses'] }}</span>
+            </div>
+        </div>
+        <div class="card" style="padding:20px;">
+            <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">% Efectividad</div>
+            <div style="font-size:28px; font-weight:800; color:#5b8af5;">{{ number_format($stats['win_rate'], 1) }}%</div>
+        </div>
+        <div class="card" style="padding:20px;">
+            <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">P&L Total</div>
+            <div style="font-size:28px; font-weight:800; {{ $stats['total_pnl'] >= 0 ? 'color:var(--green)' : 'color:var(--red)' }};">
+                {{ $stats['total_pnl'] >= 0 ? '+' : '' }}${{ number_format($stats['total_pnl'], 2) }}
+            </div>
+        </div>
+        <div class="card" style="padding:20px;">
+            <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Ganancia Promedio</div>
+            <div style="font-size:28px; font-weight:800; color:var(--green);">+${{ number_format($stats['avg_win'], 2) }}</div>
+        </div>
+        <div class="card" style="padding:20px;">
+            <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Pérdida Promedio</div>
+            <div style="font-size:28px; font-weight:800; color:var(--red);">${{ number_format($stats['avg_loss'], 2) }}</div>
+        </div>
+        @if(isset($stats['total_commission']))
+        <div class="card" style="padding:20px;">
+            <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Total Comisiones</div>
+            <div style="font-size:28px; font-weight:800; color:var(--red);">-${{ number_format($stats['total_commission'], 2) }}</div>
+        </div>
+        <div class="card" style="padding:20px;">
+            <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">P&L Neto</div>
+            <div style="font-size:28px; font-weight:800; {{ $stats['net_pnl'] >= 0 ? 'color:var(--green)' : 'color:var(--red)' }};">
+                {{ $stats['net_pnl'] >= 0 ? '+' : '' }}${{ number_format($stats['net_pnl'], 2) }}
+            </div>
+        </div>
+        @endif
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Avg Loss</div>
-        <div class="text-3xl font-bold text-red-600">
-            ${{ number_format($stats['avg_loss'], 2) }}
-        </div>
-    </div>
-</div>
-
-    <!-- Interactive Charts -->
-    <div class="mb-8">
+    <!-- Charts -->
+    <div style="margin-bottom:20px;">
         <metrics-chart
             :daily-metrics="{{ json_encode($dailyMetrics) }}"
             :stats="{{ json_encode($stats) }}"
@@ -60,32 +65,39 @@
         ></metrics-chart>
     </div>
 
-@if ($monthlyMetrics->isNotEmpty())
-    <div class="bg-white p-6 rounded shadow">
-        <h2 class="text-xl font-bold mb-4">Monthly Breakdown</h2>
-        <table class="w-full">
-            <thead class="bg-gray-100">
+    <!-- Monthly Breakdown -->
+    @if ($monthlyMetrics->isNotEmpty())
+    <div class="card" style="overflow:hidden;">
+        <div style="padding:16px 20px; border-bottom:1px solid var(--border);">
+            <h2>Desglose Mensual</h2>
+        </div>
+        <table>
+            <thead>
                 <tr>
-                    <th class="px-4 py-2 text-left">Month</th>
-                    <th class="px-4 py-2 text-right">Trades</th>
-                    <th class="px-4 py-2 text-right">Wins</th>
-                    <th class="px-4 py-2 text-right">P&L</th>
+                    <th>Mes</th>
+                    <th style="text-align:right;">Operaciones</th>
+                    <th style="text-align:right;">Ganadoras</th>
+                    <th style="text-align:right;">Efectividad</th>
+                    <th style="text-align:right;">G/P Bruto</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($monthlyMetrics as $month)
-                    <tr class="border-b">
-                        <td class="px-4 py-2">{{ $month['month'] }}</td>
-                        <td class="px-4 py-2 text-right">{{ $month['trades'] }}</td>
-                        <td class="px-4 py-2 text-right">{{ $month['wins'] }}</td>
-                        <td class="px-4 py-2 text-right font-bold {{ $month['pnl'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                            ${{ number_format($month['pnl'], 2) }}
+                    <tr>
+                        <td style="font-weight:600; color:#fff;">{{ $month['month'] }}</td>
+                        <td style="text-align:right;">{{ $month['trades'] }}</td>
+                        <td style="text-align:right; color:var(--green);">{{ $month['wins'] }}</td>
+                        <td style="text-align:right; color:#5b8af5;">
+                            {{ $month['trades'] > 0 ? number_format(($month['wins']/$month['trades'])*100, 1) : 0 }}%
+                        </td>
+                        <td style="text-align:right; font-weight:700; {{ $month['pnl'] >= 0 ? 'color:var(--green)' : 'color:var(--red)' }}">
+                            {{ $month['pnl'] >= 0 ? '+' : '' }}${{ number_format($month['pnl'], 2) }}
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
-@endif
+    @endif
 </div>
 @endsection

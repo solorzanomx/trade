@@ -31,8 +31,8 @@ class TradeMetricsService
                 'win_rate' => $trades->count() > 0 ? ($wins->count() / $trades->count()) * 100 : 0,
                 'daily_pnl' => $dailyPnL,
                 'daily_pnl_percent' => $trades->count() > 0 ? ($dailyPnL / $trades->sum('capital_used')) * 100 : 0,
-                'best_trade' => $trades->maxBy('p_l')?->symbol,
-                'worst_trade' => $trades->minBy('p_l')?->symbol,
+                'best_trade' => $trades->sortByDesc('p_l')->first()?->symbol,
+                'worst_trade' => $trades->sortBy('p_l')->first()?->symbol,
                 'avg_risk_reward' => $trades->avg(fn($t) => $t->getRiskRewardRatio()) ?? 0,
             ]
         );
@@ -48,10 +48,10 @@ class TradeMetricsService
             return;
         }
 
-        $dates = $trades->groupBy('exit_date')->keys();
+        $dates = $trades->groupBy(fn($t) => $t->exit_date->format('Y-m-d'))->keys();
 
         foreach ($dates as $date) {
-            $this->calculateDailyMetrics($user, $date);
+            $this->calculateDailyMetrics($user, Carbon::parse($date));
         }
 
         $this->updateConsistencyMetrics($user);
