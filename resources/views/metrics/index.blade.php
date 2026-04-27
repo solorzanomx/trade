@@ -3,9 +3,10 @@
 @section('title', 'Metrics - Trading Journal')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-3xl font-bold">Performance Metrics</h1>
-</div>
+<div id="app">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold">Performance Metrics</h1>
+    </div>
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
     <div class="bg-white p-6 rounded shadow">
@@ -50,6 +51,15 @@
     </div>
 </div>
 
+    <!-- Interactive Charts -->
+    <div class="mb-8">
+        <metrics-chart
+            :daily-metrics="{{ json_encode($dailyMetrics) }}"
+            :stats="{{ json_encode($stats) }}"
+            :monthly-metrics="{{ json_encode($monthlyMetrics) }}"
+        ></metrics-chart>
+    </div>
+
 @if ($monthlyMetrics->isNotEmpty())
     <div class="bg-white p-6 rounded shadow">
         <h2 class="text-xl font-bold mb-4">Monthly Breakdown</h2>
@@ -77,4 +87,5 @@
         </table>
     </div>
 @endif
+</div>
 @endsection
