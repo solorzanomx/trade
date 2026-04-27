@@ -3,33 +3,33 @@
 
 @section('content')
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-    <h1>Trades</h1>
+    <h1>Operaciones</h1>
     <div style="display:flex; gap:8px;">
-        <a href="{{ route('import.index') }}" class="btn-ghost" style="text-decoration:none;">Import CSV</a>
-        <a href="{{ route('trades.create') }}" class="btn-primary" style="text-decoration:none;">+ New Trade</a>
+        <a href="{{ route('import.index') }}" class="btn-ghost" style="text-decoration:none;">Importar CSV</a>
+        <a href="{{ route('trades.create') }}" class="btn-primary" style="text-decoration:none;">+ Nueva Operación</a>
     </div>
 </div>
 
 <!-- Filters -->
 <div class="card" style="padding:14px 16px; margin-bottom:16px;">
     <form method="GET" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <input type="text" name="symbol" placeholder="Symbol (SOFI, AAPL...)" value="{{ request('symbol') }}" class="form-input" style="width:180px;">
+        <input type="text" name="symbol" placeholder="Símbolo (SOFI, AAPL...)" value="{{ request('symbol') }}" class="form-input" style="width:180px;">
         <select name="type" class="form-input" style="width:140px;">
-            <option value="">All Types</option>
+            <option value="">Todos los tipos</option>
             <option value="call" {{ request('type') === 'call' ? 'selected' : '' }}>Call</option>
             <option value="put" {{ request('type') === 'put' ? 'selected' : '' }}>Put</option>
             <option value="stock" {{ request('type') === 'stock' ? 'selected' : '' }}>Stock</option>
         </select>
         <select name="status" class="form-input" style="width:130px;">
-            <option value="">All Status</option>
-            <option value="open" {{ request('status') === 'open' ? 'selected' : '' }}>Open</option>
-            <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Closed</option>
+            <option value="">Todos</option>
+            <option value="open" {{ request('status') === 'open' ? 'selected' : '' }}>Abiertos</option>
+            <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Cerrados</option>
         </select>
         <input type="date" name="date_from" value="{{ request('date_from') }}" class="form-input" style="width:150px;">
         <input type="date" name="date_to" value="{{ request('date_to') }}" class="form-input" style="width:150px;">
-        <button type="submit" class="btn-ghost">Filter</button>
+        <button type="submit" class="btn-ghost">Filtrar</button>
         @if(request()->anyFilled(['symbol','type','status','date_from','date_to']))
-            <a href="{{ route('trades.index') }}" style="font-size:12px; color:var(--text-muted); text-decoration:none;">Clear</a>
+            <a href="{{ route('trades.index') }}" style="font-size:12px; color:var(--text-muted); text-decoration:none;">Limpiar</a>
         @endif
     </form>
 </div>
@@ -40,18 +40,18 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Date</th>
-                <th>Symbol</th>
-                <th>Type</th>
-                <th style="text-align:right;">Buy</th>
-                <th style="text-align:right;">Sell</th>
-                <th style="text-align:right;">Contracts</th>
-                <th style="text-align:right;">P&L</th>
+                <th>Fecha</th>
+                <th>Símbolo</th>
+                <th>Tipo</th>
+                <th style="text-align:right;">Compra</th>
+                <th style="text-align:right;">Venta</th>
+                <th style="text-align:right;">Contratos</th>
+                <th style="text-align:right;">G/P</th>
                 <th style="text-align:right;">%</th>
-                <th style="text-align:right;">Commission</th>
-                <th style="text-align:right;">Net P&L</th>
-                <th>Strategy</th>
-                <th>Status</th>
+                <th style="text-align:right;">Comisión</th>
+                <th style="text-align:right;">G/P Neto</th>
+                <th>Estrategia</th>
+                <th>Estado</th>
             </tr>
         </thead>
         <tbody>
@@ -85,14 +85,14 @@
                     </td>
                     <td>
                         <span class="badge-{{ $trade->status === 'closed' ? 'blue' : 'yellow' }}" style="font-size:10px; padding:2px 8px; border-radius:4px; text-transform:uppercase; font-weight:600;">
-                            {{ $trade->status }}
+                            {{ $trade->status === 'closed' ? 'Cerrado' : 'Abierto' }}
                         </span>
                     </td>
                 </tr>
             @empty
                 <tr>
                     <td colspan="13" style="text-align:center; color:var(--text-muted); padding:48px; font-size:13px;">
-                        No trades found. <a href="{{ route('import.index') }}" style="color:var(--blue);">Import your CSV</a> or <a href="{{ route('trades.create') }}" style="color:var(--blue);">add a trade</a>.
+                        Sin operaciones. <a href="{{ route('import.index') }}" style="color:var(--blue);">Importa tu CSV</a> o <a href="{{ route('trades.create') }}" style="color:var(--blue);">agrega una operación</a>.
                     </td>
                 </tr>
             @endforelse

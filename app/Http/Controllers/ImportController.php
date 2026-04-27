@@ -29,12 +29,19 @@ class ImportController extends Controller
         $skipped = 0;
 
         foreach ($rows as $row) {
-            // Skip empty rows or header rows
+            // Need at least 7 columns
             if (count($row) < 7) continue;
 
-            // Skip rows where fecha (column 1) is empty or not a date
+            // Column 0 is row number, column 1 is fecha
+            // But CSV may also have rows where col 0 is empty and col 1 is fecha
+            // Try col 1 first (standard format), fallback to col 0
             $fechaRaw = trim($row[1] ?? '');
-            if (empty($fechaRaw) || !$this->isValidDate($fechaRaw)) continue;
+            if (empty($fechaRaw) || !$this->isValidDate($fechaRaw)) {
+                $fechaRaw = trim($row[0] ?? '');
+                if (empty($fechaRaw) || !$this->isValidDate($fechaRaw)) continue;
+                // Shift columns left if date is in col 0
+                array_unshift($row, '');
+            }
 
             // Skip rows where symbol (column 2) is empty
             $symbol = strtoupper(trim($row[2] ?? ''));
@@ -42,9 +49,9 @@ class ImportController extends Controller
 
             try {
                 $fecha = Carbon::parse($fechaRaw);
-                $tipo = strtolower(trim($row[3] ?? 'stock')); // Call/Put
+                $tipo = strtolower(trim($row[3] ?? 'stock'));
                 $precioCompra = $this->parsePrice($row[4] ?? '0');
-                $contratos = (int) trim($row[5] ?? '1');
+                $contratos = max(1, (int) preg_replace('/[^0-9]/', '', $row[5] ?? '1'));
                 $precioVenta = $this->parsePrice($row[6] ?? '0');
                 $comision = $this->parsePrice($row[9] ?? '0');
                 $estrategia = trim($row[10] ?? '');
@@ -64,7 +71,7 @@ class ImportController extends Controller
                     ['user_id' => $user->id, 'symbol' => $symbol],
                     [
                         'name' => $symbol,
-                        'asset_type' => in_array($tradeType, ['call', 'put']) ? 'option' : 'stock',
+                        'asset_type' => 'stock',
                         'is_active' => true,
                     ]
                 );

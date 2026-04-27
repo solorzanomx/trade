@@ -70,32 +70,32 @@
 
             @auth
             <nav style="padding:12px 8px; flex:1;">
-                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:8px 8px 4px;">Main</div>
+                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:8px 8px 4px;">Principal</div>
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 5a4 4 0 108 0 4 4 0 00-8 0z"/></svg>
                     Dashboard
                 </a>
                 <a href="{{ route('trades.index') }}" class="nav-link {{ request()->routeIs('trades.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17l4-8 4 4 4-6 4 4v5H3z"/></svg>
-                    Trades
+                    Operaciones
                 </a>
                 <a href="{{ route('metrics.index') }}" class="nav-link {{ request()->routeIs('metrics.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 12l5 5L20 7"/></svg>
-                    Metrics
+                    Métricas
                 </a>
                 <a href="{{ route('news.index') }}" class="nav-link {{ request()->routeIs('news.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
-                    News
+                    Noticias
                 </a>
 
-                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:16px 8px 4px;">Tools</div>
+                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:16px 8px 4px;">Herramientas</div>
                 <a href="{{ route('trades.create') }}" class="nav-link" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5v14M5 12h14"/></svg>
-                    New Trade
+                    Nueva Operación
                 </a>
                 <a href="{{ route('import.index') }}" class="nav-link {{ request()->routeIs('import.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                    Import CSV
+                    Importar CSV
                 </a>
             </nav>
 
@@ -103,7 +103,7 @@
                 <div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">{{ Auth::user()->name }}</div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" style="font-size:11px; color:var(--text-muted); background:none; border:none; cursor:pointer; padding:0;">Sign out</button>
+                    <button type="submit" style="font-size:11px; color:var(--text-muted); background:none; border:none; cursor:pointer; padding:0;">Cerrar sesión</button>
                 </form>
             </div>
             @endauth
