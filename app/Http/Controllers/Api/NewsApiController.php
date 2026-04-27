@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\DailyNewsSummary;
 use App\Models\Asset;
+use App\Services\NewsAggregationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
 
 class NewsApiController extends Controller
 {
@@ -48,26 +50,8 @@ class NewsApiController extends Controller
 
         $date = $validated['date'] ?? now()->subDay();
 
-        // Check if summary already exists
-        $existing = DailyNewsSummary::where('user_id', $request->user()->id)
-            ->where('asset_id', $asset->id)
-            ->whereDate('date', $date)
-            ->first();
-
-        if ($existing) {
-            return response()->json($existing, 200);
-        }
-
-        // TODO: Call Perplexity/Claude API to generate news summary
-        // This is a placeholder - real implementation will use NewsAggregationService
-        $summary = DailyNewsSummary::create([
-            'user_id' => $request->user()->id,
-            'asset_id' => $asset->id,
-            'date' => $date,
-            'summary' => 'News summary generation queued. Check back later.',
-            'source' => 'manual',
-            'sentiment' => 'neutral',
-        ]);
+        $service = new NewsAggregationService();
+        $summary = $service->generateNewsSummary($asset, Carbon::parse($date));
 
         return response()->json($summary, 201);
     }

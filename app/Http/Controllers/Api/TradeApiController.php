@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Trade;
 use App\Models\Asset;
 use App\Models\TradeComment;
+use App\Services\TradeMetricsService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -52,6 +53,7 @@ class TradeApiController extends Controller
         if ($trade->exit_price) {
             $trade->calculatePnL();
             $trade->save();
+            (new TradeMetricsService())->recalculateTradeMetrics($trade);
         }
 
         return response()->json($trade->load('asset', 'comments'), 201);
@@ -83,6 +85,8 @@ class TradeApiController extends Controller
             $trade->status = 'closed';
         }
         $trade->save();
+
+        (new TradeMetricsService())->recalculateTradeMetrics($trade);
 
         return response()->json($trade->load('asset', 'comments'));
     }
