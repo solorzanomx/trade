@@ -11,8 +11,10 @@ class MetricsController extends Controller
     {
         $user = $request->user();
 
-        // Get date range from request or default to last 30 days
-        $dateFrom = $request->input('date_from', now()->subDays(30)->format('Y-m-d'));
+        // Get date range — default to earliest trade or 1 year back
+        $earliestTrade = $user->trades()->where('status', 'closed')->orderBy('entry_date')->first();
+        $defaultFrom = $earliestTrade ? $earliestTrade->entry_date->format('Y-m-d') : now()->subYear()->format('Y-m-d');
+        $dateFrom = $request->input('date_from', $defaultFrom);
         $dateTo = $request->input('date_to', now()->format('Y-m-d'));
 
         // Daily metrics for chart

@@ -1,29 +1,22 @@
 <template>
-  <div class="space-y-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Win Rate Chart -->
-      <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-lg font-bold mb-4">Win Rate Over Time</h3>
-        <canvas id="winRateChart"></canvas>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div style="background:#131722; border:1px solid #2a2e39; border-radius:8px; padding:20px;">
+      <div style="font-size:12px; color:#787b86; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:16px;">% Efectividad por Día</div>
+      <canvas id="winRateChart" height="160"></canvas>
+    </div>
+    <div style="background:#131722; border:1px solid #2a2e39; border-radius:8px; padding:20px;">
+      <div style="font-size:12px; color:#787b86; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:16px;">G/P Diario</div>
+      <canvas id="pnlChart" height="160"></canvas>
+    </div>
+    <div style="background:#131722; border:1px solid #2a2e39; border-radius:8px; padding:20px;">
+      <div style="font-size:12px; color:#787b86; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:16px;">Ganadoras vs Perdedoras</div>
+      <div style="display:flex; justify-content:center;">
+        <canvas id="distributionChart" height="160" width="160"></canvas>
       </div>
-
-      <!-- P&L Chart -->
-      <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-lg font-bold mb-4">Daily P&L</h3>
-        <canvas id="pnlChart"></canvas>
-      </div>
-
-      <!-- Trade Distribution -->
-      <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-lg font-bold mb-4">Wins vs Losses</h3>
-        <canvas id="distributionChart"></canvas>
-      </div>
-
-      <!-- Monthly P&L -->
-      <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-lg font-bold mb-4">Monthly Performance</h3>
-        <canvas id="monthlyChart"></canvas>
-      </div>
+    </div>
+    <div style="background:#131722; border:1px solid #2a2e39; border-radius:8px; padding:20px;">
+      <div style="font-size:12px; color:#787b86; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:16px;">G/P Mensual</div>
+      <canvas id="monthlyChart" height="160"></canvas>
     </div>
   </div>
 </template>
@@ -33,6 +26,22 @@ import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement,
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend)
 
+const DARK = {
+  grid: 'rgba(42,46,57,0.8)',
+  text: '#787b86',
+  green: '#26a69a',
+  greenBg: 'rgba(38,166,154,0.15)',
+  red: '#ef5350',
+  redBg: 'rgba(239,83,80,0.15)',
+  blue: '#5b8af5',
+  blueBg: 'rgba(91,138,245,0.15)',
+}
+
+const baseScales = {
+  x: { grid: { color: DARK.grid }, ticks: { color: DARK.text, font: { size: 11 } } },
+  y: { grid: { color: DARK.grid }, ticks: { color: DARK.text, font: { size: 11 } } },
+}
+
 export default {
   props: {
     dailyMetrics: Array,
@@ -40,7 +49,7 @@ export default {
     monthlyMetrics: Array,
   },
   mounted() {
-    this.initCharts()
+    this.$nextTick(() => this.initCharts())
   },
   methods: {
     initCharts() {
@@ -51,133 +60,72 @@ export default {
     },
     createWinRateChart() {
       const ctx = document.getElementById('winRateChart')
-      if (!ctx || this.dailyMetrics.length === 0) return
-
-      const labels = this.dailyMetrics.map(m => new Date(m.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
-      const data = this.dailyMetrics.map(m => parseFloat(m.win_rate) || 0)
-
+      if (!ctx || !this.dailyMetrics.length) return
+      const labels = this.dailyMetrics.map(m => {
+        const d = new Date(m.date)
+        return (d.getMonth()+1) + '/' + d.getDate()
+      })
       new ChartJS(ctx, {
         type: 'line',
         data: {
           labels,
-          datasets: [{
-            label: 'Win Rate %',
-            data,
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#3b82f6',
-            pointRadius: 4,
-          }],
+          datasets: [{ label: '% Efectividad', data: this.dailyMetrics.map(m => parseFloat(m.win_rate)||0),
+            borderColor: DARK.blue, backgroundColor: DARK.blueBg, borderWidth: 2,
+            fill: true, tension: 0.3, pointBackgroundColor: DARK.blue, pointRadius: 4 }],
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: true },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
-              title: { display: true, text: 'Win Rate %' },
-            },
-          },
-        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+          scales: { ...baseScales, y: { ...baseScales.y, min: 0, max: 100 } } },
       })
     },
     createPnLChart() {
       const ctx = document.getElementById('pnlChart')
-      if (!ctx || this.dailyMetrics.length === 0) return
-
-      const labels = this.dailyMetrics.map(m => new Date(m.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
-      const data = this.dailyMetrics.map(m => parseFloat(m.daily_pnl) || 0)
-
+      if (!ctx || !this.dailyMetrics.length) return
+      const labels = this.dailyMetrics.map(m => {
+        const d = new Date(m.date)
+        return (d.getMonth()+1) + '/' + d.getDate()
+      })
+      const data = this.dailyMetrics.map(m => parseFloat(m.daily_pnl)||0)
       new ChartJS(ctx, {
         type: 'bar',
         data: {
           labels,
-          datasets: [{
-            label: 'Daily P&L $',
-            data,
-            backgroundColor: data.map(val => val >= 0 ? '#10b981' : '#ef4444'),
-            borderRadius: 4,
-          }],
+          datasets: [{ label: 'G/P $', data,
+            backgroundColor: data.map(v => v >= 0 ? DARK.greenBg : DARK.redBg),
+            borderColor: data.map(v => v >= 0 ? DARK.green : DARK.red),
+            borderWidth: 1, borderRadius: 4 }],
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-          },
-          scales: {
-            y: {
-              title: { display: true, text: 'P&L ($)' },
-            },
-          },
-        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: baseScales },
       })
     },
     createDistributionChart() {
       const ctx = document.getElementById('distributionChart')
       if (!ctx) return
-
-      const wins = this.stats.wins || 0
-      const losses = this.stats.losses || 0
-
       new ChartJS(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Wins', 'Losses'],
-          datasets: [{
-            data: [wins, losses],
-            backgroundColor: ['#10b981', '#ef4444'],
-            borderColor: ['#059669', '#dc2626'],
-            borderWidth: 2,
-          }],
+          labels: ['Ganadoras', 'Perdedoras'],
+          datasets: [{ data: [this.stats.wins||0, this.stats.losses||0],
+            backgroundColor: [DARK.greenBg, DARK.redBg],
+            borderColor: [DARK.green, DARK.red], borderWidth: 2 }],
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { position: 'bottom' },
-          },
-        },
+        options: { responsive: false, cutout: '65%',
+          plugins: { legend: { position: 'bottom', labels: { color: DARK.text, font: { size: 12 }, padding: 16 } } } },
       })
     },
     createMonthlyChart() {
       const ctx = document.getElementById('monthlyChart')
-      if (!ctx || this.monthlyMetrics.length === 0) return
-
-      const labels = this.monthlyMetrics.map(m => m.month)
-      const pnl = this.monthlyMetrics.map(m => parseFloat(m.pnl) || 0)
-
+      if (!ctx || !this.monthlyMetrics.length) return
+      const pnl = this.monthlyMetrics.map(m => parseFloat(m.pnl)||0)
       new ChartJS(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
-          labels,
-          datasets: [{
-            label: 'Monthly P&L $',
-            data: pnl,
-            borderColor: '#8b5cf6',
-            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#8b5cf6',
-            pointRadius: 5,
-          }],
+          labels: this.monthlyMetrics.map(m => m.month),
+          datasets: [{ label: 'G/P $', data: pnl,
+            backgroundColor: pnl.map(v => v >= 0 ? DARK.greenBg : DARK.redBg),
+            borderColor: pnl.map(v => v >= 0 ? DARK.green : DARK.red),
+            borderWidth: 1, borderRadius: 4 }],
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: true },
-          },
-          scales: {
-            y: {
-              title: { display: true, text: 'P&L ($)' },
-            },
-          },
-        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: baseScales },
       })
     },
   },

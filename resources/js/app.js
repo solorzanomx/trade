@@ -4,7 +4,9 @@ import TradeForm from './components/TradeForm.vue'
 
 const app = createApp({})
 
-app.component('MetricsChart', MetricsChart)
-app.component('TradeForm', TradeForm)
+app.component('metrics-chart', MetricsChart)
+app.component('trade-form', TradeForm)
 
-app.mount('#app')
+if (document.getElementById('app')) {
+    app.mount('#app')
+}
