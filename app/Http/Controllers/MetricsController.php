@@ -28,6 +28,7 @@ class MetricsController extends Controller
         if ($allClosedTrades->isEmpty()) {
             return view('metrics.index', [
                 'dailyMetrics' => collect(),
+                'monthlyMetrics' => collect(),
                 'dateFrom' => $dateFrom,
                 'dateTo' => $dateTo,
                 'stats' => [
