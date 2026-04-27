@@ -15,8 +15,11 @@ class TradeController extends Controller
             ->with('asset', 'comments')
             ->when($request->symbol, fn($q) => $q->where('symbol', strtoupper($request->symbol)))
             ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->type, fn($q) => $q->where('trade_type', $request->type))
+            ->when($request->date_from, fn($q) => $q->whereDate('entry_date', '>=', $request->date_from))
+            ->when($request->date_to, fn($q) => $q->whereDate('entry_date', '<=', $request->date_to))
             ->orderByDesc('entry_date')
-            ->paginate(20);
+            ->paginate(50);
 
         $assets = $request->user()->assets()->where('is_active', true)->get();
 

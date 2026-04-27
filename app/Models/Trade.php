@@ -13,20 +13,25 @@ class Trade extends Model
         'entry_price', 'entry_date', 'entry_time', 'entry_reason',
         'exit_price', 'exit_date', 'exit_time', 'exit_reason',
         'quantity', 'capital_used', 'stop_loss', 'take_profit',
-        'p_l', 'p_l_percent', 'status', 'emotional_state', 'mistakes_made',
+        'commission', 'p_l', 'p_l_percent', 'net_p_l',
+        'status', 'emotional_state', 'mistakes_made',
+        'strategy', 'setup_quality', 'followed_plan',
     ];
 
     protected $casts = [
         'entry_date' => 'date',
-        'entry_time' => 'time',
+        'entry_time' => 'string',
         'exit_date' => 'date',
-        'exit_time' => 'time',
+        'exit_time' => 'string',
         'entry_price' => 'decimal:4',
         'exit_price' => 'decimal:4',
         'stop_loss' => 'decimal:4',
         'take_profit' => 'decimal:4',
         'p_l' => 'decimal:2',
         'p_l_percent' => 'decimal:4',
+        'commission' => 'decimal:2',
+        'net_p_l' => 'decimal:2',
+        'followed_plan' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -49,6 +54,7 @@ class Trade extends Model
         if ($this->exit_price && $this->entry_price) {
             $this->p_l = ($this->exit_price - $this->entry_price) * $this->quantity;
             $this->p_l_percent = (($this->exit_price - $this->entry_price) / $this->entry_price) * 100;
+            $this->net_p_l = $this->p_l - abs($this->commission ?? 0);
         }
     }
 

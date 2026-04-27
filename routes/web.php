@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TradeController;
 use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\ImportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,4 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/metrics', [MetricsController::class, 'index'])->name('metrics.index');
 
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+
+    Route::get('/import', [ImportController::class, 'index'])->name('import.index');
+    Route::post('/import', [ImportController::class, 'store'])->name('import.store');
 });

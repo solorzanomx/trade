@@ -1,94 +1,139 @@
 @extends('layouts.app')
-
-@section('title', 'Dashboard - Trading Journal')
+@section('title', 'Dashboard - TradeLog')
 
 @section('content')
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Total P&L</div>
-        <div class="text-3xl font-bold {{ $totalPnL >= 0 ? 'text-green-600' : 'text-red-600' }}">
-            ${{ number_format($totalPnL, 2) }}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+    <div>
+        <h1>Dashboard</h1>
+        <div class="text-muted" style="font-size:13px; margin-top:2px;">{{ now()->format('l, M d Y') }}</div>
+    </div>
+    <a href="{{ route('trades.create') }}" class="btn-primary" style="text-decoration:none;">+ New Trade</a>
+</div>
+
+<!-- Stats Row -->
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;">
+    <div class="card" style="padding:20px;">
+        <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Total P&L</div>
+        <div style="font-size:28px; font-weight:800; {{ $totalPnL >= 0 ? 'color:var(--green)' : 'color:var(--red)' }};">
+            {{ $totalPnL >= 0 ? '+' : '' }}${{ number_format($totalPnL, 2) }}
         </div>
+        <div class="text-muted" style="font-size:11px; margin-top:4px;">All time</div>
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Win Rate</div>
-        <div class="text-3xl font-bold text-blue-600">
-            {{ number_format($winRate, 1) }}%
-        </div>
+    <div class="card" style="padding:20px;">
+        <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Win Rate</div>
+        <div style="font-size:28px; font-weight:800; color:#5b8af5;">{{ number_format($winRate, 1) }}%</div>
+        <div class="text-muted" style="font-size:11px; margin-top:4px;">Closed trades</div>
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Today's P&L</div>
+    <div class="card" style="padding:20px;">
+        <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Today's P&L</div>
         @if ($todayMetric)
-            <div class="text-3xl font-bold {{ $todayMetric->daily_pnl >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                ${{ number_format($todayMetric->daily_pnl, 2) }}
+            <div style="font-size:28px; font-weight:800; {{ $todayMetric->daily_pnl >= 0 ? 'color:var(--green)' : 'color:var(--red)' }};">
+                {{ $todayMetric->daily_pnl >= 0 ? '+' : '' }}${{ number_format($todayMetric->daily_pnl, 2) }}
             </div>
-            <div class="text-sm text-gray-500">{{ $todayMetric->trades_count }} trades</div>
+            <div class="text-muted" style="font-size:11px; margin-top:4px;">{{ $todayMetric->trades_count }} trades today</div>
         @else
-            <div class="text-3xl font-bold text-gray-400">--</div>
+            <div style="font-size:28px; font-weight:800; color:var(--text-muted);">--</div>
+            <div class="text-muted" style="font-size:11px; margin-top:4px;">No trades today</div>
         @endif
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <div class="text-gray-600">Current Streak</div>
+    <div class="card" style="padding:20px;">
+        <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Streak</div>
         @if ($currentStreak > 0)
-            <div class="text-3xl font-bold {{ $streakType === 'win' ? 'text-green-600' : 'text-red-600' }}">
-                {{ $currentStreak }} {{ $streakType === 'win' ? '✓' : '✗' }}
+            <div style="font-size:28px; font-weight:800; {{ $streakType === 'win' ? 'color:var(--green)' : 'color:var(--red)' }};">
+                {{ $currentStreak }}{{ $streakType === 'win' ? 'W' : 'L' }}
             </div>
+            <div class="text-muted" style="font-size:11px; margin-top:4px;">{{ $streakType === 'win' ? 'Winning' : 'Losing' }} streak</div>
         @else
-            <div class="text-3xl font-bold text-gray-400">--</div>
+            <div style="font-size:28px; font-weight:800; color:var(--text-muted);">--</div>
+            <div class="text-muted" style="font-size:11px; margin-top:4px;">No streak</div>
         @endif
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <div class="bg-white p-6 rounded shadow">
-        <h2 class="text-xl font-bold mb-4">Recent Trades</h2>
-        <div class="space-y-3">
-            @forelse ($recentTrades as $trade)
-                <a href="{{ route('trades.show', $trade) }}" class="block p-3 border rounded hover:bg-gray-50">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="font-semibold">{{ $trade->symbol }}</div>
-                            <div class="text-sm text-gray-600">{{ $trade->entry_date->format('M d, Y') }}</div>
-                        </div>
-                        @if ($trade->p_l !== null)
-                            <div class="font-bold {{ $trade->p_l >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                                ${{ number_format($trade->p_l, 2) }}
-                            </div>
-                        @else
-                            <div class="text-gray-500">Open</div>
-                        @endif
-                    </div>
-                </a>
-            @empty
-                <p class="text-gray-500">No trades yet</p>
-            @endforelse
+<!-- Content Grid -->
+<div style="display:grid; grid-template-columns:1fr 380px; gap:16px;">
+    <!-- Recent Trades -->
+    <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <h2>Recent Trades</h2>
+            <a href="{{ route('trades.index') }}" style="font-size:12px; color:var(--blue); text-decoration:none;">View all</a>
         </div>
-
-        <a href="{{ route('trades.create') }}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            New Trade
-        </a>
+        <table>
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Type</th>
+                    <th>Entry</th>
+                    <th>Exit</th>
+                    <th style="text-align:right;">P&L</th>
+                    <th style="text-align:right;">P&L Net</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($recentTrades as $trade)
+                    <tr style="cursor:pointer;" onclick="window.location='{{ route('trades.show', $trade) }}'">
+                        <td>
+                            <span style="font-weight:700; color:#fff;">{{ $trade->symbol }}</span>
+                        </td>
+                        <td>
+                            <span class="badge-{{ $trade->trade_type === 'call' ? 'green' : ($trade->trade_type === 'put' ? 'red' : 'blue') }}" style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; text-transform:uppercase;">
+                                {{ $trade->trade_type }}
+                            </span>
+                        </td>
+                        <td style="font-size:13px;">${{ number_format($trade->entry_price, 2) }}</td>
+                        <td style="font-size:13px;">{{ $trade->exit_price ? '$'.number_format($trade->exit_price,2) : '<span style="color:var(--yellow)">Open</span>' }}</td>
+                        <td style="text-align:right; font-weight:700; {{ $trade->p_l >= 0 ? 'color:var(--green)' : 'color:var(--red)' }}">
+                            {{ $trade->p_l !== null ? ($trade->p_l >= 0 ? '+' : '').'$'.number_format($trade->p_l,2) : '--' }}
+                        </td>
+                        <td style="text-align:right; font-size:12px; {{ ($trade->net_p_l ?? 0) >= 0 ? 'color:var(--green)' : 'color:var(--red)' }}">
+                            {{ $trade->net_p_l !== null ? ($trade->net_p_l >= 0 ? '+' : '').'$'.number_format($trade->net_p_l,2) : '--' }}
+                        </td>
+                        <td class="text-muted" style="font-size:12px;">{{ $trade->entry_date->format('M d') }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No trades yet. <a href="{{ route('import.index') }}" style="color:var(--blue);">Import your CSV</a></td></tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <h2 class="text-xl font-bold mb-4">Today's News</h2>
-        <div class="space-y-3">
-            @forelse ($todayNews as $news)
-                <a href="{{ route('news.index', ['asset_id' => $news->asset_id]) }}" class="block p-3 border rounded hover:bg-gray-50">
-                    <div class="font-semibold">{{ $news->asset->symbol }}</div>
-                    <p class="text-sm text-gray-600 line-clamp-2">{{ $news->summary }}</p>
-                    <div class="text-xs text-gray-500 mt-2">{{ ucfirst($news->sentiment) }} • {{ $news->source }}</div>
-                </a>
-            @empty
-                <p class="text-gray-500">No news summaries available</p>
-            @endforelse
+    <!-- Right Column -->
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        <!-- Quick Actions -->
+        <div class="card" style="padding:16px 20px;">
+            <h2 style="margin-bottom:12px;">Quick Actions</h2>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <a href="{{ route('trades.create') }}" class="btn-primary" style="text-decoration:none; text-align:center;">+ Log Trade</a>
+                <a href="{{ route('import.index') }}" class="btn-ghost" style="text-decoration:none; text-align:center;">Import CSV</a>
+            </div>
         </div>
 
-        <a href="{{ route('news.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-700">
-            View All News →
-        </a>
+        <!-- Today's News -->
+        <div class="card" style="padding:0; overflow:hidden; flex:1;">
+            <div style="padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                <h2>Market News</h2>
+                <a href="{{ route('news.index') }}" style="font-size:12px; color:var(--blue); text-decoration:none;">View all</a>
+            </div>
+            <div style="padding:12px;">
+                @forelse ($todayNews as $news)
+                    <a href="{{ route('news.index', ['asset_id' => $news->asset_id]) }}" style="text-decoration:none; display:block; padding:10px; border-radius:6px; margin-bottom:4px;" class="card-hover">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span style="font-weight:700; color:#fff; font-size:12px;">{{ $news->asset->symbol }}</span>
+                            <span class="badge-{{ $news->sentiment === 'positive' ? 'green' : ($news->sentiment === 'negative' ? 'red' : 'blue') }}" style="font-size:10px; padding:1px 6px; border-radius:3px;">
+                                {{ ucfirst($news->sentiment) }}
+                            </span>
+                        </div>
+                        <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ $news->summary }}</p>
+                    </a>
+                @empty
+                    <div style="padding:20px; text-align:center; color:var(--text-muted); font-size:12px;">No news available</div>
+                @endforelse
+            </div>
+        </div>
     </div>
 </div>
 @endsection
