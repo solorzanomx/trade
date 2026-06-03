@@ -18,14 +18,16 @@ class IBKRController extends Controller
             'xml_file' => 'required|file|mimes:xml,txt|max:20480',
         ]);
 
-        $path = $request->file('xml_file')->store('ibkr_temp');
+        $path = $request->file('xml_file')->store('ibkr_temp', 'local');
         $fullPath = storage_path('app/' . $path);
 
         $service = new IBKRImportService($request->user());
         $results = $service->import($fullPath);
 
-        // Limpiar el archivo temporal
-        unlink($fullPath);
+        // Limpiar el archivo temporal después de importar
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
+        }
 
         return redirect()->route('ibkr.index')->with('ibkr_results', $results);
     }
