@@ -196,7 +196,7 @@ class IBKRImportService
                 'p_l'         => round($grossPnl, 2),
                 'net_p_l'     => round($netPnl, 2),
                 'p_l_percent' => $openTrade->capital_used > 0
-                    ? round(($grossPnl / $openTrade->capital_used) * 100, 4)
+                    ? round(min(9999.99, max(-9999.99, ($grossPnl / $openTrade->capital_used) * 100)), 4)
                     : 0,
                 'status'         => 'closed',
                 'ibkr_exec_id'   => $orderId,
