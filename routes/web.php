@@ -6,6 +6,7 @@ use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\IBKRController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,6 +24,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/import', [ImportController::class, 'index'])->name('import.index');
     Route::post('/import', [ImportController::class, 'store'])->name('import.store');
+
+    // IBKR Import
+    Route::get('/ibkr', [IBKRController::class, 'index'])->name('ibkr.index');
+    Route::post('/ibkr/import', [IBKRController::class, 'import'])->name('ibkr.import');
 
     // Portafolio largo plazo
     Route::resource('portfolio', PortfolioController::class)->except(['show']);

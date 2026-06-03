@@ -16,6 +16,7 @@ class Trade extends Model
         'commission', 'p_l', 'p_l_percent', 'net_p_l',
         'status', 'emotional_state', 'mistakes_made',
         'strategy', 'setup_quality', 'followed_plan',
+        'ibkr_order_id', 'ibkr_exec_id',
     ];
 
     protected $casts = [

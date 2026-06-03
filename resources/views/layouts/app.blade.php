@@ -101,6 +101,10 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     Importar CSV
                 </a>
+                <a href="{{ route('ibkr.index') }}" class="nav-link {{ request()->routeIs('ibkr.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3" stroke="white" stroke-width="2" fill="none"/></svg>
+                    IBKR Import
+                </a>
             </nav>
 
             <div style="padding:12px 16px; border-top:1px solid var(--border);">
