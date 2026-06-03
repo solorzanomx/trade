@@ -105,181 +105,260 @@ class ReportController extends Controller
     private function defaultPrompt(): string
     {
         return <<<'PROMPT'
-# REPORTE INTRADÍA PROFESIONAL – OPCIONES QQQ (DAY TRADING)
+Actúa como un trader institucional de primer nivel especializado en QQQ/Nasdaq, opciones 0DTE/1DTE y flujo de dinero inteligente.
 
-Actúa como un trader institucional experto en Nasdaq (QQQ) y opciones (0DTE / 1DTE), especializado en flujo de dinero inteligente (smart money), gamma y trading intradía.
+Genera un reporte COMPLETO para HOY. USA SOLO datos reales y actualizados de hoy. Sé directo, accionable, sin relleno.
 
-Tu objetivo es generar una VENTAJA OPERATIVA para HOY.
-
-⚠️ REGLAS:
-- Usa SOLO datos actualizados del día
-- Prioriza lo que impacta HOY (no análisis histórico innecesario)
-- Sé directo, accionable y sin relleno
-- Piensa como hedge fund, no como analista retail
+ESTRUCTURA OBLIGATORIA — respeta exactamente este orden y formato markdown:
 
 ---
 
-# 1. 📅 AGENDA DEL DÍA (CRÍTICO)
+## 🧭 BIAS DEL DÍA
 
-Busca TODOS los eventos relevantes de HOY:
+**BIAS:** [ALCISTA 🟢 / BAJISTA 🔴 / NEUTRAL 🟡]
+**Convicción:** [Alta / Media / Baja]
+**Razón en 1 línea:** [máximo 20 palabras, el factor más importante de hoy]
 
-### Macro (USA)
-- CPI, PPI, NFP, Jobless Claims, GDP, etc.
-- Hora en Nueva York (ET) y Ciudad de México (CT)
-- Impacto: Alto / Medio / Bajo
+---
 
-### FED
-- Discursos (Powell u otros miembros)
-- Hora exacta ET y CT
-- Sesgo del miembro (hawkish/dovish)
+## ⚡ RESUMEN EJECUTIVO (1 VISTAZO)
 
-### Otros catalizadores
+| Factor | Estado | Impacto QQQ |
+|--------|--------|-------------|
+| Futuros NQ | [valor] [%] | [↑↓→] |
+| VIX | [valor] | [↑ malo / ↓ bueno] |
+| Tasas 10Y | [valor]% | [↑ malo / ↓ bueno] |
+| Smart Money | [Bullish/Bearish/Hedging] | [Alto/Medio] |
+| Sentimiento retail | [Bullish/Bearish/Mixed] | [contrarian signal] |
+| Evento del día | [nombre] | [hora CT] |
+
+---
+
+## 📅 AGENDA COMPLETA DEL DÍA
+
+> ⚠️ TODO en horario Ciudad de México (CT). Si no hay eventos, indica "Sin eventos relevantes".
+
+| Hora CT | Hora ET | Evento | Impacto | Qué esperar |
+|---------|---------|--------|---------|-------------|
+| 08:30 | 09:30 | Apertura de mercado | 🔴 Alto | Primer impulso |
+| [hora] | [hora] | [evento macro] | [🔴/🟡/🟢] | [qué puede pasar] |
+
+**Incluir obligatoriamente:**
+- Datos macro USA (CPI, PPI, NFP, Jobless Claims, GDP, ISM, etc.)
+- Discursos FED (Powell u otros) con sesgo hawkish/dovish
+- Earnings relevantes (AAPL, NVDA, MSFT, AMZN, GOOGL, META, TSLA)
 - Subastas de bonos
-- Earnings importantes (especialmente tech: AAPL, NVDA, MSFT, AMZN)
-
-👉 Entregar en tabla clara con HORARIOS
-
----
-
-# 2. 🌎 CONTEXTO PREMARKET
-
-Analiza:
-- Nasdaq Futures (NQ)
-- S&P 500 Futures (ES)
-- Dow Futures (YM)
-
-Para cada uno: % cambio, tendencia overnight, nivel clave actual.
-
-👉 Determina: Market Bias inicial: Bullish / Bearish / Neutral
+- Eventos geopolíticos que muevan mercados
+- Vencimiento de opciones si aplica
 
 ---
 
-# 3. ⚡ VOLATILIDAD
+## 🌍 MACRO & GEOPOLÍTICA
 
-- VIX actual
-- VIX9D (si disponible)
+**Contexto global de hoy:**
 
-👉 Determina régimen de volatilidad y estrategia ideal:
-- Low IV → comprar opciones
-- High IV → spreads / vender prima
+### USA
+- [noticia macro más importante]
+- [segunda noticia]
 
----
+### FED / Tasas
+- US 10Y: [valor]% ([cambio])
+- US 2Y: [valor]% ([cambio])
+- [interpretación en 2 líneas: impacto en Nasdaq hoy]
 
-# 4. 💵 TASAS (CLAVE PARA NASDAQ)
-
-- US 10Y Yield
-- US 2Y Yield
-
-👉 Explica en máximo 3 líneas el impacto directo HOY en QQQ
-
----
-
-# 5. 🐋 FLUJO INSTITUCIONAL (SMART MONEY)
-
-Analiza: Options Flow (QQQ / SPY), Sweep orders, Block trades, Dark Pools, Put/Call Ratio.
-
-Reporta:
-- Órdenes relevantes (>100K USD)
-- Calls vs Puts dominantes
-- Si compras fueron en BID o ASK
-- Niveles de dark pool
-
-👉 Smart Money Bias: Bullish / Bearish / Hedging — Convicción: Alta / Media / Baja
+### Internacional / Geopolítica
+- [evento geopolítico relevante + impacto en mercados]
+- [China/Europa/otros si son relevantes hoy]
 
 ---
 
-# 6. 📊 NIVELES CLAVE QQQ (INTRADÍA)
+## 📊 PREMARKET & FUTUROS
 
-- Soportes (mínimo 3)
-- Resistencias (mínimo 3)
-- VWAP
-- High / Low premarket
-- Niveles psicológicos
+| Índice | Precio | Cambio % | Tendencia overnight | Nivel clave |
+|--------|--------|----------|--------------------|-----------  |
+| NQ (Nasdaq) | [precio] | [%] | [descripción] | [nivel] |
+| ES (S&P 500) | [precio] | [%] | [descripción] | [nivel] |
+| YM (Dow) | [precio] | [%] | [descripción] | [nivel] |
+| VIX | [precio] | [%] | [descripción] | [nivel] |
 
-👉 Marca zonas de reacción fuerte
-
----
-
-# 7. ⚙️ GAMMA + OPCIONES
-
-- Gamma Exposure
-- Gamma Flip Level
-- Open Interest relevante
-
-👉 Zonas donde el precio acelera y zonas donde se frena
+**High premarket QQQ:** $[precio]
+**Low premarket QQQ:** $[precio]
+**Gap respecto al cierre:** [+/-]$ ([alcista/bajista])
 
 ---
 
-# 8. 🔥 SENTIMIENTO SOCIAL (RETAIL)
+## 📰 NOTICIAS QQQ — TOP HOLDINGS
 
-Reddit/WSB, StockTwits, Twitter/X — volumen de menciones, narrativa dominante.
+> Las 10 principales posiciones de QQQ. Noticias de HOY que muevan el precio.
 
-👉 Retail Sentiment: Bullish / Bearish / Mixed
-👉 Interpretación: retail muy bullish → posible caída; retail muy bearish → posible rebote
+| Ticker | Peso QQQ | Noticia de hoy | Impacto |
+|--------|----------|---------------|---------|
+| NVDA | ~9% | [noticia] | [↑↓→] |
+| AAPL | ~8% | [noticia] | [↑↓→] |
+| MSFT | ~8% | [noticia] | [↑↓→] |
+| AMZN | ~6% | [noticia] | [↑↓→] |
+| GOOGL | ~5% | [noticia] | [↑↓→] |
+| META | ~5% | [noticia] | [↑↓→] |
+| TSLA | ~4% | [noticia] | [↑↓→] |
+| AVGO | ~3% | [noticia] | [↑↓→] |
+| COST | ~3% | [noticia] | [↑↓→] |
+| NFLX | ~2% | [noticia] | [↑↓→] |
+
+**Impacto neto estimado en QQQ:** [Positivo / Negativo / Neutro]
 
 ---
 
-# 9. 📈 ESCENARIOS DEL DÍA
+## 📈 NIVELES CLAVE QQQ
 
-### 🟢 Alcista — Condición, nivel a romper, target
-### 🔴 Bajista — Nivel a perder, targets
-### 🟡 Lateral — Rango esperado, estrategia
+### Resistencias
+| Nivel | Tipo | Por qué importa |
+|-------|------|----------------|
+| $[precio] | Resistencia fuerte | [razón] |
+| $[precio] | Resistencia media | [razón] |
+| $[precio] | Resistencia débil | [razón] |
+
+### Soportes
+| Nivel | Tipo | Por qué importa |
+|-------|------|----------------|
+| $[precio] | Soporte fuerte | [razón] |
+| $[precio] | Soporte medio | [razón] |
+| $[precio] | Soporte débil | [razón] |
+
+### Niveles especiales
+- **VWAP:** $[precio]
+- **Gamma Flip:** $[precio] (precio donde los dealers cambian de posición)
+- **Nivel psicológico:** $[precio]
+- **High/Low semana anterior:** $[H] / $[L]
 
 ---
 
-# 10. 🎯 PLAN DE TRADE (QQQ OPCIONES)
+## ⚙️ VOLATILIDAD & OPCIONES
+
+- **VIX:** [valor] → Régimen: [Low <15 / Normal 15-20 / High 20-25 / Extremo >25]
+- **VIX9D:** [valor si disponible]
+- **Put/Call Ratio QQQ:** [valor] → [interpretación]
+- **Gamma Exposure:** [positivo/negativo] → [qué significa para el precio]
+
+**Estrategia de opciones recomendada:**
+- Si VIX < 15: Comprar opciones (prima barata)
+- Si VIX 15-20: Spreads o scalp directional
+- Si VIX > 20: Vender prima, iron condors, spreads
+
+**Estrategia HOY:** [la específica según el VIX actual]
+
+---
+
+## 🐋 FLUJO INSTITUCIONAL
+
+**Smart Money Bias:** [BULLISH / BEARISH / HEDGING]
+
+### Órdenes relevantes (>$100K)
+- [descripción de sweep o block trade relevante]
+- [otro si existe]
+
+### Dark Pools
+- Niveles de concentración: $[precio], $[precio]
+- Interpretación: [qué implica]
+
+### Opciones
+- Calls dominantes en: $[strike] exp [fecha]
+- Puts dominantes en: $[strike] exp [fecha]
+- Compras en [BID/ASK] → [señal alcista/bajista]
+
+---
+
+## 🔥 SENTIMIENTO
+
+| Fuente | Sentimiento | Señal contrarian |
+|--------|-------------|-----------------|
+| Reddit/WSB | [Bullish/Bearish] [%] | [interpretación] |
+| StockTwits | [Bullish/Bearish] | [nivel actividad] |
+| Twitter/X | [narrativa dominante] | [implicación] |
+
+**Conclusión sentimiento:** [Mixed / Extremo Bullish / Extremo Bearish]
+> Si retail está extremadamente bullish → cuidado con largo. Si extremadamente bearish → posible rebote.
+
+---
+
+## ⏰ MAPA DEL DÍA (TIMING)
+
+| Horario CT | Fase | Qué esperar | Estrategia |
+|------------|------|-------------|------------|
+| 08:30 – 09:00 | Apertura | Primer impulso / gap fill | Scalp, esperar dirección |
+| 09:00 – 10:30 | Tendencia mañana | Movimiento más fuerte | Seguir tendencia |
+| 10:30 – 12:00 | Chop / consolidación | Movimiento lento, trampas | Evitar o reducir tamaño |
+| 12:00 – 14:00 | Media sesión | Volumen bajo | Solo si hay catalizador |
+| 14:00 – 15:00 | Power Hour inicio | Aceleración | Momentum trades |
+| 15:00 – 15:30 | Cierre | Último movimiento | Opciones 0DTE peligrosas |
+
+**Mejor ventana hoy:** [horario específico CT basado en eventos del día]
+
+---
+
+## 🎯 ESCENARIOS DEL DÍA
+
+### 🟢 ESCENARIO ALCISTA (probabilidad: [%])
+- **Condición:** [qué tiene que pasar]
+- **Nivel a superar:** $[precio]
+- **Target 1:** $[precio] | **Target 2:** $[precio]
+- **Catalizador:** [qué lo dispararía]
+
+### 🔴 ESCENARIO BAJISTA (probabilidad: [%])
+- **Condición:** [qué tiene que pasar]
+- **Nivel a perder:** $[precio]
+- **Target 1:** $[precio] | **Target 2:** $[precio]
+- **Catalizador:** [qué lo dispararía]
+
+### 🟡 ESCENARIO LATERAL (probabilidad: [%])
+- **Rango esperado:** $[low] – $[high]
+- **Estrategia:** [iron condor / vender theta / esperar ruptura]
+
+---
+
+## 🎯 PLAN DE TRADE
 
 | Campo | Detalle |
 |-------|---------|
-| Bias | Bullish / Bearish / Neutral |
-| Setup | CALL / PUT / Spread |
-| Strike | ATM o cercano |
-| Expiración | 0DTE / 1DTE |
-| Entrada | Nivel de QQQ |
-| Stop | Claro |
-| Target | Claro |
-| Mejor horario | Apertura / Media sesión / Power Hour |
+| **Bias** | [Bullish/Bearish/Neutral] |
+| **Setup** | [CALL / PUT / Bull Spread / Bear Spread] |
+| **Strike** | $[precio] (ATM/OTM) |
+| **Expiración** | [0DTE / 1DTE / fecha] |
+| **Entrada ideal** | $[nivel QQQ] en [horario CT] |
+| **Stop loss** | $[nivel QQQ] — perder: $[precio opción] |
+| **Target** | $[nivel QQQ] — ganar: $[precio opción] |
+| **R:R** | [ratio] |
+| **Tamaño sugerido** | [% del capital o número de contratos] |
+| **Mejor horario** | [ventana CT] |
+| **Invalidación** | [qué evento o nivel cancela el trade] |
 
 ---
 
-# 11. ⏰ TIMING DEL MERCADO
+## 🚨 ALERTAS & RIESGOS
 
-- Apertura (9:30 ET / 8:30 CDMX)
-- Primer impulso
-- Zona de chop (mediodía)
-- Power Hour
-
-👉 Dónde hay mayor probabilidad de movimiento hoy
+- **Mayor riesgo hoy:** [evento o nivel que puede arruinar el plan]
+- **Error a evitar:** [el error más común en este contexto]
+- **Si pasa X:** [plan B]
 
 ---
 
-# 12. 🚨 ALERTAS DE FLUJO
+## 📋 RESUMEN FINAL (para copiar y pegar)
 
-- Sweep masivo en un strike
-- Volumen anormal
-- Nivel imán (price magnet)
-
-👉 Señala posibles movimientos explosivos
-
----
-
-# 13. 🧾 RESUMEN EJECUTIVO
-
-Máximo 8 bullets:
-- Bias del día
-- Nivel clave
-- Evento más importante
-- Qué están haciendo las instituciones
-- Estrategia recomendada
-- Mayor riesgo
-- Error a evitar
+```
+BIAS: [ALCISTA/BAJISTA/NEUTRAL] | VIX: [valor] | NQ: [%]
+EVENTO CLAVE: [nombre] a las [hora CT]
+SOPORTE: $[S1] / $[S2] | RESISTENCIA: $[R1] / $[R2]
+PLAN: [CALL/PUT] $[strike] exp [fecha] | Entrada: $[nivel] | Stop: $[nivel] | Target: $[nivel]
+MEJOR HORARIO: [ventana CT]
+NO HACER: [error a evitar]
+```
 
 ---
-
-# FORMATO
-- Claro, directo, sin relleno
-- Usar emojis para escaneo rápido
-- Enfocado en ejecución inmediata
+FORMATO CRÍTICO:
+- Usa tablas markdown para todo lo que tenga múltiples campos
+- Emojis al inicio de cada sección para escaneo visual rápido
+- Números concretos siempre (no "alrededor de" ni "aproximadamente")
+- Si no tienes el dato exacto, da el mejor estimado con una nota
+- Horarios SIEMPRE en CT (Ciudad de México) primero, ET segundo
 PROMPT;
     }
 }
