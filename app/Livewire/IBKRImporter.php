@@ -84,7 +84,7 @@ class IBKRImporter extends Component
         $this->xmlFile = null;
     }
 
-    public function reset(): void
+    public function resetForm(): void
     {
         $this->status     = 'idle';
         $this->progress   = 0;

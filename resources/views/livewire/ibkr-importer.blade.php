@@ -56,7 +56,7 @@
             </button>
 
             @if($xmlFile)
-            <button type="button" wire:click="reset" class="btn-ghost" style="font-size:13px;">
+            <button type="button" wire:click="resetForm" class="btn-ghost" style="font-size:13px;">
                 Cancelar
             </button>
             @endif
@@ -168,7 +168,7 @@
         <div style="display:flex; gap:12px;">
             <a href="{{ route('trades.index') }}" class="btn-primary" style="text-decoration:none;">Ver operaciones</a>
             <a href="{{ route('metrics.index') }}" style="text-decoration:none; padding:10px 16px; font-size:13px; color:#5b8af5;">Ver métricas →</a>
-            <button wire:click="reset" class="btn-ghost" style="margin-left:auto; font-size:13px;">Nueva importación</button>
+            <button wire:click="resetForm" class="btn-ghost" style="margin-left:auto; font-size:13px;">Nueva importación</button>
         </div>
     </div>
     @endif
@@ -179,7 +179,7 @@
         <div style="font-size:36px; margin-bottom:12px;">❌</div>
         <div style="color:var(--red); font-weight:700; margin-bottom:8px;">Error en la importación</div>
         <div class="text-muted" style="font-size:13px; margin-bottom:20px;">{{ $message }}</div>
-        <button wire:click="reset" class="btn-ghost">Intentar de nuevo</button>
+        <button wire:click="resetForm" class="btn-ghost">Intentar de nuevo</button>
     </div>
     @endif
 </div>
