@@ -73,7 +73,10 @@ class IBKRImportService
             $this->processOrder($orderId, $executions);
         }
 
-        // Cerrar automáticamente opciones expiradas que quedaron como "open"
+        // Procesar expiraciones reales de IBKR (OptionEAE)
+        $this->processExpirations($xml);
+
+        // Cerrar automáticamente opciones expiradas que quedaron como "open" (fallback)
         $this->closeExpiredOptions();
 
         return $this->results;
@@ -280,6 +283,77 @@ class IBKRImportService
         if (!empty($exec['expiry']))  $parts[] = 'Exp: ' . $exec['expiry'];
         if (!empty($exec['exchange'])) $parts[] = 'Exchange: ' . $exec['exchange'];
         return implode(' | ', array_filter($parts));
+    }
+
+    /**
+     * Procesa expiraciones reales de IBKR (OptionEAE — Exercises, Assignments & Expirations).
+     * Usa el realizedPnl real de IBKR en lugar de calcularlo.
+     */
+    private function processExpirations(\SimpleXMLElement $xml): void
+    {
+        foreach ($xml->FlexStatements->FlexStatement as $statement) {
+            if (!isset($statement->OptionEAE)) continue;
+
+            foreach ($statement->OptionEAE->OptionEAE as $eae) {
+                $attrs = (array) $eae->attributes();
+                $a     = $attrs['@attributes'];
+
+                if (($a['transactionType'] ?? '') !== 'Expiration') continue;
+                if (($a['currency'] ?? '') !== 'USD') continue;
+                if (empty($a['symbol'])) continue;
+
+                $symbol     = trim($a['symbol']);
+                $date       = Carbon::createFromFormat('Ymd', $a['date'])->toDateString();
+                $realizedPnl= (float)($a['realizedPnl'] ?? 0);
+                $tradeId    = $a['tradeID'] ?? null;
+
+                // Evitar duplicados por tradeID
+                if ($tradeId) {
+                    $exists = Trade::where('user_id', $this->user->id)
+                        ->where('ibkr_exec_id', 'EXP-' . $tradeId)
+                        ->exists();
+                    if ($exists) continue;
+                }
+
+                // Buscar el trade abierto más reciente para este símbolo
+                $openTrade = Trade::where('user_id', $this->user->id)
+                    ->where('symbol', $symbol)
+                    ->where('status', 'open')
+                    ->whereNull('exit_price')
+                    ->orderByDesc('entry_date')
+                    ->first();
+
+                if ($openTrade) {
+                    $comm   = (float)($openTrade->commission ?? 0);
+                    $netPnl = $realizedPnl - $comm;
+
+                    $openTrade->update([
+                        'exit_price'  => 0,
+                        'exit_date'   => $date,
+                        'exit_time'   => '16:00',
+                        'p_l'         => round($realizedPnl, 2),
+                        'net_p_l'     => round($netPnl, 2),
+                        'p_l_percent' => -100,
+                        'status'      => 'closed',
+                        'exit_reason' => 'Expiró sin valor — IBKR P&L real',
+                        'ibkr_exec_id'=> 'EXP-' . $tradeId,
+                    ]);
+
+                    (new TradeMetricsService())->recalculateTradeMetrics($openTrade);
+
+                    $this->results['closed']++;
+                    $this->results['trades'][] = [
+                        'action' => 'expirada (IBKR)',
+                        'symbol' => $symbol,
+                        'type'   => str_contains(strtolower($a['putCall'] ?? ''), 'c') ? 'call' : 'put',
+                        'price'  => 0,
+                        'qty'    => abs((float)($a['quantity'] ?? 0)),
+                        'date'   => $date,
+                        'pnl'    => round($realizedPnl, 2),
+                    ];
+                }
+            }
+        }
     }
 
     /**
