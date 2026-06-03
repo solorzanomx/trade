@@ -59,7 +59,12 @@
                 <tr style="cursor:pointer;" onclick="window.location='{{ route('trades.show', $trade) }}'">
                     <td class="text-muted" style="font-size:11px;">{{ $trades->firstItem() + $i }}</td>
                     <td class="text-muted" style="font-size:12px;">{{ $trade->entry_date->format('M d, Y') }}</td>
-                    <td style="font-weight:700; color:#fff;">{{ $trade->symbol }}</td>
+                    <td>
+                        <span style="font-weight:700; color:#fff;">{{ Str::before($trade->symbol, ' ') ?: $trade->symbol }}</span>
+                        @if(str_contains($trade->symbol, ' '))
+                        <div style="font-size:10px; color:var(--text-muted); font-family:monospace; white-space:nowrap;">{{ $trade->symbol }}</div>
+                        @endif
+                    </td>
                     <td>
                         <span class="badge-{{ $trade->trade_type === 'call' ? 'green' : ($trade->trade_type === 'put' ? 'red' : 'blue') }}" style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; text-transform:uppercase; white-space:nowrap;">
                             {{ $trade->trade_type }}

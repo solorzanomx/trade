@@ -287,7 +287,12 @@
             <tbody>
                 @forelse($recentTrades as $trade)
                 <tr style="cursor:pointer;" onclick="window.location='{{ route('trades.show', $trade) }}'">
-                    <td><span style="font-weight:700; color:#fff;">{{ $trade->symbol }}</span></td>
+                    <td>
+                        <span style="font-weight:700; color:#fff;">{{ Str::before($trade->symbol, ' ') ?: $trade->symbol }}</span>
+                        @if(str_contains($trade->symbol, ' '))
+                        <div style="font-size:10px; color:var(--text-muted); font-family:monospace;">{{ $trade->symbol }}</div>
+                        @endif
+                    </td>
                     <td>
                         <span style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; text-transform:uppercase;
                             {{ $trade->trade_type === 'call' ? 'background:rgba(38,166,154,0.15); color:var(--green);'
@@ -298,7 +303,11 @@
                     </td>
                     <td style="text-align:right; font-size:13px;">${{ number_format($trade->entry_price, 2) }}</td>
                     <td style="text-align:right; font-size:13px;">
-                        {{ $trade->exit_price ? '$'.number_format($trade->exit_price,2) : '<span style="color:#f9a825; font-size:11px;">Abierta</span>' }}
+                        @if($trade->exit_price)
+                            ${{ number_format($trade->exit_price, 2) }}
+                        @else
+                            <span style="color:#f9a825; font-size:11px;">Abierta</span>
+                        @endif
                     </td>
                     <td style="text-align:right; font-weight:700; {{ ($trade->net_p_l ?? $trade->p_l ?? 0) >= 0 ? 'color:var(--green)' : 'color:var(--red)' }}">
                         @if($trade->net_p_l !== null)
