@@ -43,5 +43,10 @@ return [
         'api_key' => env('ANTHROPIC_API_KEY'),
     ],
 
+    'ibkr' => [
+        'flex_token'    => env('IBKR_FLEX_TOKEN'),
+        'flex_query_id' => env('IBKR_FLEX_QUERY_ID'),
+    ],
+
 ];
 
