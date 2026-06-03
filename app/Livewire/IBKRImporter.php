@@ -40,21 +40,21 @@ class IBKRImporter extends Component
         $this->progress = 40;
 
         try {
-            // Guardar archivo
-            $dir      = storage_path('app/ibkr_temp');
+            // Livewire v4 ya subió el archivo a livewire-tmp
+            // Leemos directo del TemporaryUploadedFile
+            $contents = file_get_contents($this->xmlFile->getRealPath());
+
+            if (!$contents) {
+                throw new \RuntimeException('No se pudo leer el archivo subido.');
+            }
+
+            // Guardamos en ibkr_temp para el servicio
+            $dir = storage_path('app/ibkr_temp');
             if (!is_dir($dir)) mkdir($dir, 0777, true);
 
             $filename = 'ibkr_' . now()->format('YmdHis') . '_' . auth()->id() . '.xml';
             $fullPath = $dir . '/' . $filename;
-            $this->xmlFile->storeAs('ibkr_temp', $filename, 'local');
-
-            // Buscar el archivo (Livewire lo guarda en tmp primero)
-            if (!file_exists($fullPath)) {
-                // Livewire almacena en storage/app/livewire-tmp
-                $tmpPath = storage_path('app/livewire-tmp/' . $this->xmlFile->getFilename());
-                $contents = file_get_contents($tmpPath ?: $this->xmlFile->getRealPath());
-                file_put_contents($fullPath, $contents);
-            }
+            file_put_contents($fullPath, $contents);
 
             $this->message  = 'Procesando trades...';
             $this->progress = 65;
