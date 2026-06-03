@@ -300,8 +300,8 @@ class IBKRImportService
 
             // Si la fecha de expiración ya pasó, cerrar con P&L = -comisión (expiró sin valor)
             if ($expiry->isPast() && !$expiry->isToday()) {
-                $cost   = (float)$trade->entry_price * (float)$trade->quantity * 100; // opciones = x100
-                $loss   = -$cost; // pérdida total de la prima pagada
+                // entry_price ya contiene el valor por contrato (premium × 100 incluido en tradeMoney/qty)
+                $loss   = -(float)$trade->entry_price * (float)$trade->quantity;
                 $comm   = (float)($trade->commission ?? 0);
                 $netPnl = $loss - $comm;
 
