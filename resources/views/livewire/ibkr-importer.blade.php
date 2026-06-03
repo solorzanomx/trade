@@ -35,8 +35,8 @@
         <input type="file" id="ibkrFile" accept=".xml,.txt" style="display:none;"
                wire:model="xmlFile">
 
-        @if($errors->has('xmlFile'))
-        <div class="alert-error" style="margin-bottom:12px;">{{ $errors->first('xmlFile') }}</div>
+        @if(!empty($errors['xmlFile']))
+        <div class="alert-error" style="margin-bottom:12px;">{{ is_array($errors['xmlFile']) ? $errors['xmlFile'][0] : $errors['xmlFile'] }}</div>
         @endif
 
         {{-- Barra de progreso de upload --}}
