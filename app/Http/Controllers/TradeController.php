@@ -13,11 +13,11 @@ class TradeController extends Controller
     {
         $trades = $request->user()->trades()
             ->with('asset', 'comments')
-            ->when($request->symbol, fn($q) => $q->where('symbol', strtoupper($request->symbol)))
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->type, fn($q) => $q->where('trade_type', $request->type))
+            ->when($request->symbol,    fn($q) => $q->where('symbol', strtoupper($request->symbol)))
+            ->when($request->status,    fn($q) => $q->where('status', $request->status))
+            ->when($request->type,      fn($q) => $q->where('trade_type', $request->type))
             ->when($request->date_from, fn($q) => $q->whereDate('entry_date', '>=', $request->date_from))
-            ->when($request->date_to, fn($q) => $q->whereDate('entry_date', '<=', $request->date_to))
+            ->when($request->date_to,   fn($q) => $q->whereDate('entry_date', '<=', $request->date_to))
             ->orderByDesc('entry_date')
             ->paginate(50);
 
@@ -35,30 +35,35 @@ class TradeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'symbol' => 'required|string|uppercase',
-            'trade_type' => 'required|in:stock,call,put',
+            'symbol'             => 'required|string|max:20',
+            'trade_type'         => 'required|in:stock,call,put',
             'position_direction' => 'required|in:long,short',
-            'entry_price' => 'required|numeric|min:0.01',
-            'entry_date' => 'required|date',
-            'entry_time' => 'nullable|date_format:H:i',
-            'entry_reason' => 'nullable|string',
-            'quantity' => 'required|integer|min:1',
-            'capital_used' => 'required|numeric|min:0.01',
-            'stop_loss' => 'nullable|numeric',
-            'take_profit' => 'nullable|numeric',
+            'entry_price'        => 'required|numeric|min:0.0001',
+            'entry_date'         => 'required|date',
+            'entry_time'         => 'nullable|date_format:H:i',
+            'entry_reason'       => 'nullable|string',
+            'quantity'           => 'required|numeric|min:1',
+            'capital_used'       => 'required|numeric|min:0.01',
+            'stop_loss'          => 'nullable|numeric|min:0',
+            'take_profit'        => 'nullable|numeric|min:0',
+            'commission'         => 'nullable|numeric|min:0',
+            'strategy'           => 'nullable|string|max:100',
+            'setup_quality'      => 'nullable|in:A+,A,B,C',
         ]);
 
+        $validated['symbol']  = strtoupper($validated['symbol']);
         $validated['user_id'] = $request->user()->id;
+        $validated['commission'] = $validated['commission'] ?? 0;
 
         $asset = Asset::firstOrCreate(
             ['user_id' => $request->user()->id, 'symbol' => $validated['symbol']],
             ['name' => $validated['symbol'], 'asset_type' => 'stock']
         );
-
         $validated['asset_id'] = $asset->id;
+
         $trade = Trade::create($validated);
 
-        return redirect()->route('trades.show', $trade)->with('success', 'Trade created successfully');
+        return redirect()->route('trades.show', $trade)->with('success', "Operación {$trade->symbol} registrada.");
     }
 
     public function show(Trade $trade)
@@ -71,8 +76,7 @@ class TradeController extends Controller
     public function edit(Trade $trade)
     {
         $this->authorize('update', $trade);
-        $assets = $trade->user->assets()->where('is_active', true)->get();
-        return view('trades.edit', compact('trade', 'assets'));
+        return view('trades.edit', compact('trade'));
     }
 
     public function update(Request $request, Trade $trade)
@@ -80,12 +84,16 @@ class TradeController extends Controller
         $this->authorize('update', $trade);
 
         $validated = $request->validate([
-            'exit_price' => 'nullable|numeric|min:0.01',
-            'exit_date' => 'nullable|date|after_or_equal:entry_date',
-            'exit_time' => 'nullable|date_format:H:i',
-            'exit_reason' => 'nullable|string',
-            'emotional_state' => 'nullable|string',
-            'mistakes_made' => 'nullable|string',
+            'exit_price'     => 'nullable|numeric|min:0.0001',
+            'exit_date'      => 'nullable|date|after_or_equal:entry_date',
+            'exit_time'      => 'nullable|date_format:H:i',
+            'exit_reason'    => 'nullable|string',
+            'commission'     => 'nullable|numeric|min:0',
+            'strategy'       => 'nullable|string|max:100',
+            'setup_quality'  => 'nullable|in:A+,A,B,C',
+            'emotional_state'=> 'nullable|string|max:50',
+            'followed_plan'  => 'nullable|boolean',
+            'mistakes_made'  => 'nullable|string',
         ]);
 
         $trade->update($validated);
@@ -97,13 +105,14 @@ class TradeController extends Controller
             (new TradeMetricsService())->recalculateTradeMetrics($trade);
         }
 
-        return redirect()->route('trades.show', $trade)->with('success', 'Trade updated successfully');
+        return redirect()->route('trades.show', $trade)->with('success', "Operación {$trade->symbol} actualizada.");
     }
 
     public function destroy(Request $request, Trade $trade)
     {
         $this->authorize('delete', $trade);
+        $symbol = $trade->symbol;
         $trade->delete();
-        return redirect()->route('trades.index')->with('success', 'Trade deleted successfully');
+        return redirect()->route('trades.index')->with('success', "Operación {$symbol} eliminada.");
     }
 }

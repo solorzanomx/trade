@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ConsistencyMetric::class);
     }
+
+    public function portfolioPositions(): HasMany
+    {
+        return $this->hasMany(PortfolioPosition::class);
+    }
 }

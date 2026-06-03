@@ -87,6 +87,10 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
                     Noticias
                 </a>
+                <a href="{{ route('portfolio.index') }}" class="nav-link {{ request()->routeIs('portfolio.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h20M6 20V10M12 20V4M18 20v-6"/></svg>
+                    Portafolio LP
+                </a>
 
                 <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:16px 8px 4px;">Herramientas</div>
                 <a href="{{ route('trades.create') }}" class="nav-link" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
