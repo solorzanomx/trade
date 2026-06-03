@@ -35,9 +35,9 @@
         <input type="file" id="ibkrFile" accept=".xml,.txt" style="display:none;"
                wire:model="xmlFile">
 
-        @error('xmlFile')
-        <div class="alert-error" style="margin-bottom:12px;">{{ $message }}</div>
-        @enderror
+        @if($errors->has('xmlFile'))
+        <div class="alert-error" style="margin-bottom:12px;">{{ $errors->first('xmlFile') }}</div>
+        @endif
 
         {{-- Barra de progreso de upload --}}
         @if($status === 'uploading')
