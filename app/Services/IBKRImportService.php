@@ -73,6 +73,9 @@ class IBKRImportService
             $this->processOrder($orderId, $executions);
         }
 
+        // Cerrar automáticamente opciones expiradas que quedaron como "open"
+        $this->closeExpiredOptions();
+
         return $this->results;
     }
 
@@ -277,6 +280,76 @@ class IBKRImportService
         if (!empty($exec['expiry']))  $parts[] = 'Exp: ' . $exec['expiry'];
         if (!empty($exec['exchange'])) $parts[] = 'Exchange: ' . $exec['exchange'];
         return implode(' | ', array_filter($parts));
+    }
+
+    /**
+     * Cierra automáticamente opciones que ya expiraron y quedaron como "open".
+     * Parsea la fecha de expiración del símbolo IBKR: YYMMDD (ej: QQQ 260602C00745000 → 2026-06-02)
+     */
+    private function closeExpiredOptions(): void
+    {
+        $openOptions = Trade::where('user_id', $this->user->id)
+            ->where('status', 'open')
+            ->whereIn('trade_type', ['call', 'put'])
+            ->whereNull('exit_price')
+            ->get();
+
+        foreach ($openOptions as $trade) {
+            $expiry = $this->parseOptionExpiry($trade->symbol);
+            if (!$expiry) continue;
+
+            // Si la fecha de expiración ya pasó, cerrar con P&L = -comisión (expiró sin valor)
+            if ($expiry->isPast() && !$expiry->isToday()) {
+                $cost   = (float)$trade->entry_price * (float)$trade->quantity * 100; // opciones = x100
+                $loss   = -$cost; // pérdida total de la prima pagada
+                $comm   = (float)($trade->commission ?? 0);
+                $netPnl = $loss - $comm;
+
+                $trade->update([
+                    'exit_price'  => 0,
+                    'exit_date'   => $expiry->toDateString(),
+                    'exit_time'   => '16:00',
+                    'p_l'         => round($loss, 2),
+                    'net_p_l'     => round($netPnl, 2),
+                    'p_l_percent' => -100,
+                    'status'      => 'closed',
+                    'exit_reason' => 'Expiró sin valor (0DTE)',
+                ]);
+
+                $this->results['closed']++;
+                $this->results['trades'][] = [
+                    'action' => 'expirada',
+                    'symbol' => $trade->symbol,
+                    'type'   => $trade->trade_type,
+                    'price'  => 0,
+                    'qty'    => $trade->quantity,
+                    'date'   => $expiry->toDateString(),
+                    'pnl'    => round($loss, 2),
+                ];
+            }
+        }
+    }
+
+    /**
+     * Parsea la fecha de expiración del símbolo de opción IBKR.
+     * Formato: "QQQ 260602C00745000" → Carbon(2026-06-02)
+     * O bien símbolo OCC: "QQQ260602C00745000"
+     */
+    private function parseOptionExpiry(string $symbol): ?Carbon
+    {
+        // Intentar formato "TICKER YYMMDDXSTRIKE" (con espacio)
+        if (preg_match('/\s(\d{6})[CP]\d+/', $symbol, $m)) {
+            try {
+                return Carbon::createFromFormat('ymd', $m[1]);
+            } catch (\Throwable $e) {}
+        }
+        // Intentar formato "TICKERYYMMDDXSTRIKE" (sin espacio)
+        if (preg_match('/[A-Z]+(\d{6})[CP]\d+/', $symbol, $m)) {
+            try {
+                return Carbon::createFromFormat('ymd', $m[1]);
+            } catch (\Throwable $e) {}
+        }
+        return null;
     }
 
     private function ensureAsset(array $exec): Asset
