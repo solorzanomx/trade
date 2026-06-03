@@ -27,10 +27,24 @@ class IBKRImportService
 
     public function import(string $xmlPath): array
     {
-        $xml = simplexml_load_file($xmlPath);
+        if (!file_exists($xmlPath)) {
+            $this->results['errors'][] = 'Archivo no encontrado: ' . $xmlPath;
+            return $this->results;
+        }
+
+        $contents = file_get_contents($xmlPath);
+        if (!$contents) {
+            $this->results['errors'][] = 'No se pudo leer el archivo XML.';
+            return $this->results;
+        }
+
+        // Desactivar errores externos de libxml para evitar warnings
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($contents);
+        libxml_clear_errors();
 
         if (!$xml) {
-            $this->results['errors'][] = 'No se pudo leer el archivo XML.';
+            $this->results['errors'][] = 'XML inválido o formato incorrecto.';
             return $this->results;
         }
 

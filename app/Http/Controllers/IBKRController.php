@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\IBKRImportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class IBKRController extends Controller
 {
@@ -15,16 +16,29 @@ class IBKRController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'xml_file' => 'required|file|mimes:xml,txt|max:20480',
+            'xml_file' => 'required|file|max:51200',
         ]);
 
-        $path = $request->file('xml_file')->store('ibkr_temp', 'local');
-        $fullPath = storage_path('app/' . $path);
+        // Guardar con nombre fijo y extensión .xml
+        $dir      = storage_path('app/ibkr_temp');
+        $filename = Str::random(32) . '.xml';
+        $fullPath = $dir . '/' . $filename;
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        // Mover el archivo uploadado directamente
+        $request->file('xml_file')->move($dir, $filename);
+
+        if (!file_exists($fullPath)) {
+            return back()->withErrors(['xml_file' => 'No se pudo guardar el archivo en el servidor.']);
+        }
 
         $service = new IBKRImportService($request->user());
         $results = $service->import($fullPath);
 
-        // Limpiar el archivo temporal después de importar
+        // Limpiar el archivo temporal
         if (file_exists($fullPath)) {
             unlink($fullPath);
         }
