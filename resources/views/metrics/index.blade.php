@@ -85,11 +85,11 @@
     {{-- Max Drawdown --}}
     <div class="card" style="padding:20px;">
         <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Max Drawdown</div>
-        <div style="font-size:28px; font-weight:800; color:{{ $advanced['max_drawdown'] > -10 ? '#f59e0b' : '#ef5350' }};">
-            {{ number_format($advanced['max_drawdown'], 1) }}%
+        <div style="font-size:28px; font-weight:800; color:{{ $advanced['max_drawdown'] > -100 ? '#f59e0b' : '#ef5350' }};">
+            ${{ number_format($advanced['max_drawdown'], 0) }}
         </div>
         <div class="text-muted" style="font-size:11px; margin-top:4px;">
-            Actual: {{ number_format($advanced['current_drawdown'], 1) }}%
+            Actual desde pico: ${{ number_format($advanced['current_drawdown'], 2) }}
         </div>
     </div>
 
@@ -149,11 +149,11 @@
 <div class="card" style="padding:20px; margin-bottom:20px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <div>
-            <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);">Drawdown (%)</div>
-            <div class="text-muted" style="font-size:11px; margin-top:2px;">Caída desde el pico de capital</div>
+            <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);">Drawdown ($)</div>
+            <div class="text-muted" style="font-size:11px; margin-top:2px;">Caída en dólares desde el pico de P&L</div>
         </div>
-        <div style="font-size:18px; font-weight:700; color:{{ $advanced['max_drawdown'] > -10 ? '#f59e0b' : '#ef5350' }};">
-            Máx: {{ number_format($advanced['max_drawdown'], 1) }}%
+        <div style="font-size:18px; font-weight:700; color:{{ $advanced['max_drawdown'] > -100 ? '#f59e0b' : '#ef5350' }};">
+            Máx: ${{ number_format($advanced['max_drawdown'], 0) }}
         </div>
     </div>
     <canvas id="drawdownChart" height="60"></canvas>

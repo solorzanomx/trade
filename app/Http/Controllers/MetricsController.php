@@ -63,9 +63,9 @@ class MetricsController extends Controller
         // ── Equity curve & drawdown ───────────────────────────────────────────
         $equityCurve   = [];
         $drawdownCurve = [];
-        $cumPnl  = 0;
-        $peak    = 0;
-        $maxDrawdown = 0;
+        $cumPnl          = 0;
+        $peak            = PHP_INT_MIN;
+        $maxDrawdownAbs  = 0; // max drawdown in dollars (negative)
         $currentDrawdown = 0;
 
         foreach ($sorted as $trade) {
@@ -76,10 +76,11 @@ class MetricsController extends Controller
                 $peak = $cumPnl;
             }
 
-            $dd = $peak > 0 ? (($cumPnl - $peak) / $peak) * 100 : 0;
+            // Dollar-based drawdown from peak — avoids division by tiny peak values
+            $dd = $peak !== PHP_INT_MIN ? $cumPnl - $peak : 0;
 
-            if ($dd < $maxDrawdown) {
-                $maxDrawdown = $dd;
+            if ($dd < $maxDrawdownAbs) {
+                $maxDrawdownAbs = $dd;
             }
 
             $currentDrawdown = $dd;
@@ -87,6 +88,7 @@ class MetricsController extends Controller
             $equityCurve[]   = ['date' => $label, 'value' => round($cumPnl, 2)];
             $drawdownCurve[] = ['date' => $label, 'value' => round($dd, 2)];
         }
+        $maxDrawdown = $maxDrawdownAbs; // dollar value (negative means loss from peak)
 
         // ── R-Multiple & Expectancy ───────────────────────────────────────────
         $rMultiples = [];

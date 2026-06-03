@@ -191,14 +191,15 @@ class IBKRImportService
 
         if ($openTrade) {
             // Cerrar el trade existente
-            $grossPnl = $pnl; // IBKR ya calcula el P&L FIFO real
-            $netPnl   = $grossPnl - $comm;
+            $grossPnl  = $pnl; // IBKR ya calcula el P&L FIFO real
+            $totalComm = round(($openTrade->commission ?? 0) + $comm, 4);
+            $netPnl    = $grossPnl - $totalComm;  // deducir comisión total (apertura + cierre)
 
             $openTrade->update([
                 'exit_price'  => round($avgPrice, 4),
                 'exit_date'   => $date,
                 'exit_time'   => $time,
-                'commission'  => round(($openTrade->commission ?? 0) + $comm, 4),
+                'commission'  => $totalComm,
                 'p_l'         => round($grossPnl, 2),
                 'net_p_l'     => round($netPnl, 2),
                 'p_l_percent' => $openTrade->capital_used > 0
