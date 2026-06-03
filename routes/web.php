@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function () {
     // IBKR Import
     Route::get('/ibkr', [IBKRController::class, 'index'])->name('ibkr.index');
     Route::post('/ibkr/import', [IBKRController::class, 'import'])->name('ibkr.import');
+    Route::post('/ibkr/sync', [IBKRController::class, 'sync'])->name('ibkr.sync');
 
     // Portafolio largo plazo
     Route::resource('portfolio', PortfolioController::class)->except(['show']);
