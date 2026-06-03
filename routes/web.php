@@ -7,6 +7,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\IBKRController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,6 +27,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/import', [ImportController::class, 'index'])->name('import.index');
     Route::post('/import', [ImportController::class, 'store'])->name('import.store');
+
+    // Reportes diarios
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/setup', [ReportController::class, 'setup'])->name('reports.setup');
+    Route::get('/reports/{reportTemplate}/edit', [ReportController::class, 'edit'])->name('reports.edit');
+    Route::put('/reports/{reportTemplate}', [ReportController::class, 'update'])->name('reports.update');
+    Route::post('/reports/{reportTemplate}/generate', [ReportController::class, 'generate'])->name('reports.generate');
 
     // IBKR Import
     Route::get('/ibkr', [IBKRController::class, 'index'])->name('ibkr.index');

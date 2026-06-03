@@ -60,4 +60,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(PortfolioPosition::class);
     }
+
+    public function reportTemplates(): HasMany
+    {
+        return $this->hasMany(ReportTemplate::class);
+    }
+
+    public function dailyReports(): HasMany
+    {
+        return $this->hasMany(DailyReport::class);
+    }
 }
