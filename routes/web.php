@@ -8,6 +8,8 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\IBKRController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\JournalController;
+use App\Http\Controllers\TradingPlanController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -34,6 +36,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/{reportTemplate}/edit', [ReportController::class, 'edit'])->name('reports.edit');
     Route::put('/reports/{reportTemplate}', [ReportController::class, 'update'])->name('reports.update');
     Route::post('/reports/{reportTemplate}/generate', [ReportController::class, 'generate'])->name('reports.generate');
+
+    // Diario de Trading
+    Route::get('/journal', [JournalController::class, 'index'])->name('journal.index');
+    Route::get('/journal/{date}', [JournalController::class, 'day'])->name('journal.day');
+    Route::post('/journal/{date}', [JournalController::class, 'save'])->name('journal.save');
+
+    // Plan de Trading
+    Route::get('/plan', [TradingPlanController::class, 'index'])->name('plan.index');
+    Route::post('/plan', [TradingPlanController::class, 'save'])->name('plan.save');
 
     // IBKR Import
     Route::get('/ibkr', [IBKRController::class, 'index'])->name('ibkr.index');

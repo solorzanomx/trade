@@ -16,6 +16,44 @@
 </div>
 
 {{-- ═══════════════════════════════════════════
+     ALERTS INTELIGENTES
+═══════════════════════════════════════════ --}}
+@foreach($alerts as $alert)
+<div style="padding:12px 18px; margin-bottom:10px; border-radius:8px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    {{ $alert['type'] === 'danger'
+        ? 'background:rgba(239,83,80,0.1); border:1px solid rgba(239,83,80,0.4);'
+        : 'background:rgba(249,168,37,0.08); border:1px solid rgba(249,168,37,0.3);' }}">
+    <span style="font-size:20px; flex-shrink:0;">{{ $alert['icon'] }}</span>
+    <div style="flex:1;">
+        <div style="font-size:13px; font-weight:700; color:{{ $alert['type'] === 'danger' ? 'var(--red)' : '#f9a825' }}; margin-bottom:2px;">
+            {{ $alert['title'] }}
+        </div>
+        <div style="font-size:12px; color:var(--text-muted);">{{ $alert['msg'] }}</div>
+    </div>
+    @if($alert['type'] === 'danger')
+    <div style="font-size:12px; font-weight:700; color:var(--red); padding:4px 12px; border:1px solid rgba(239,83,80,0.4); border-radius:4px; flex-shrink:0;">
+        STOP TRADING
+    </div>
+    @endif
+</div>
+@endforeach
+
+{{-- Entrada de diario faltante --}}
+@if(!$todayJournal && now()->isWeekday())
+<div style="padding:10px 18px; margin-bottom:10px; border-radius:8px; display:flex; align-items:center; gap:12px;
+            background:rgba(91,138,245,0.06); border:1px solid rgba(91,138,245,0.25);">
+    <span style="font-size:18px;">📓</span>
+    <div style="flex:1; font-size:13px; color:var(--text-secondary);">
+        No has escrito tu entrada en el diario de hoy.
+    </div>
+    <a href="{{ route('journal.day', now()->setTimezone('America/Mexico_City')->toDateString()) }}"
+       style="font-size:12px; color:#5b8af5; text-decoration:none; padding:4px 12px; border:1px solid rgba(91,138,245,0.3); border-radius:4px; flex-shrink:0; white-space:nowrap;">
+        Escribir ahora →
+    </a>
+</div>
+@endif
+
+{{-- ═══════════════════════════════════════════
      FILA 1: BIAS DEL DÍA (si hay reporte)
 ═══════════════════════════════════════════ --}}
 @if($reportBias)
@@ -357,6 +395,30 @@
 
     </div>
 </div>
+
+{{-- INSIGHTS ROW --}}
+@if(count($insights) > 1)
+<div class="card" style="padding:0; overflow:hidden; margin-top:16px;">
+    <div style="padding:12px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px; font-weight:700; color:#fff;">🧠 Insights de tu historial</span>
+        <a href="{{ route('plan.index') }}" style="font-size:12px; color:#5b8af5; text-decoration:none;">Ver plan de trading →</a>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0;">
+        @foreach($insights as $i => $insight)
+        <div style="padding:14px 18px; {{ $i > 0 ? 'border-left:1px solid var(--border);' : '' }}">
+            <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px;">
+                {{ $insight['icon'] }} {{ $insight['label'] ?? 'Insight' }}
+            </div>
+            <div style="font-size:12px; color:var(--text-primary); line-height:1.4; margin-bottom:4px;">{{ $insight['text'] }}</div>
+            @if(isset($insight['value']))
+            <div style="font-size:18px; font-weight:800; color:{{ $insight['color'] ?? '#fff' }};">{{ $insight['value'] }}</div>
+            @endif
+        </div>
+        @if($i == 3) @break @endif
+        @endforeach
+    </div>
+</div>
+@endif
 
 <script>
 function copyResumen() {

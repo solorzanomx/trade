@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\TradingInsightsService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -76,11 +77,22 @@ class DashboardController extends Controller
             }
         }
 
+        // Smart alerts + insights
+        $plan     = $user->tradingPlan;
+        $service  = new TradingInsightsService($user);
+        $alerts   = $service->getAlerts($plan);
+        $insights = $service->getInsights();
+
+        // Entrada del diario de hoy
+        $todayJournal = $user->journalEntries()
+            ->whereDate('entry_date', $today)
+            ->first();
+
         return view('dashboard.index', compact(
             'todayMetric', 'recentTrades', 'totalPnL', 'winRate',
             'todayNews', 'currentStreak', 'streakType',
             'todayReport', 'reportBias', 'reportAgenda', 'reportLevels', 'reportSummary',
-            'template'
+            'template', 'alerts', 'insights', 'todayJournal', 'plan'
         ));
     }
 

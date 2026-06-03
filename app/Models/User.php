@@ -70,4 +70,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(DailyReport::class);
     }
+
+    public function journalEntries(): HasMany
+    {
+        return $this->hasMany(JournalEntry::class);
+    }
+
+    public function tradingPlan(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(TradingPlan::class);
+    }
 }

@@ -70,45 +70,76 @@
             </div>
 
             @auth
-            <nav style="padding:12px 8px; flex:1;">
-                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:8px 8px 4px;">Principal</div>
-                <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
+            <nav style="padding:8px 8px; flex:1; overflow-y:auto;">
+                @php
+                    $navLink = fn($route, $label, $icon, $routePattern = null) =>
+                        '<a href="'.route($route).'" class="nav-link '.(request()->routeIs($routePattern ?? $route.'*') ? 'active' : '').'" style="display:flex;align-items:center;gap:8px;width:100%;margin-bottom:1px;">'.$icon.$label.'</a>';
+                    $sec = fn($label) =>
+                        '<div style="font-size:10px;color:var(--text-muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:14px 8px 4px;">'.$label.'</div>';
+                @endphp
+
+                {{-- TRADING --}}
+                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:8px 8px 4px;">Trading</div>
+
+                <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 5a4 4 0 108 0 4 4 0 00-8 0z"/></svg>
                     Dashboard
                 </a>
-                <a href="{{ route('trades.index') }}" class="nav-link {{ request()->routeIs('trades.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
+                <a href="{{ route('trades.index') }}" class="nav-link {{ request()->routeIs('trades.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17l4-8 4 4 4-6 4 4v5H3z"/></svg>
                     Operaciones
                 </a>
-                <a href="{{ route('metrics.index') }}" class="nav-link {{ request()->routeIs('metrics.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 12l5 5L20 7"/></svg>
+                <a href="{{ route('trades.create') }}" class="nav-link" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px; padding-left:28px; font-size:12px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+                    Nueva Operación
+                </a>
+                <a href="{{ route('metrics.index') }}" class="nav-link {{ request()->routeIs('metrics.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                     Métricas
                 </a>
-                <a href="{{ route('news.index') }}" class="nav-link {{ request()->routeIs('news.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
+
+                {{-- BITÁCORA --}}
+                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:14px 8px 4px;">Bitácora</div>
+
+                <a href="{{ route('journal.index') }}" class="nav-link {{ request()->routeIs('journal.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 014 17V5a2 2 0 012-2h12a2 2 0 012 2v12"/></svg>
+                    Diario de Trading
+                </a>
+                <a href="{{ route('plan.index') }}" class="nav-link {{ request()->routeIs('plan.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                    Plan de Trading
+                </a>
+
+                {{-- MERCADO --}}
+                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:14px 8px 4px;">Mercado</div>
+
+                <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    Reporte QQQ
+                </a>
+                <a href="{{ route('news.index') }}" class="nav-link {{ request()->routeIs('news.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
                     Noticias
                 </a>
-                <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Reporte QQQ
-                </a>
-                <a href="{{ route('portfolio.index') }}" class="nav-link {{ request()->routeIs('portfolio.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
+
+                {{-- PORTAFOLIO --}}
+                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:14px 8px 4px;">Portafolio</div>
+
+                <a href="{{ route('portfolio.index') }}" class="nav-link {{ request()->routeIs('portfolio.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h20M6 20V10M12 20V4M18 20v-6"/></svg>
                     Portafolio LP
                 </a>
 
-                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:16px 8px 4px;">Herramientas</div>
-                <a href="{{ route('trades.create') }}" class="nav-link" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5v14M5 12h14"/></svg>
-                    Nueva Operación
+                {{-- HERRAMIENTAS --}}
+                <div style="font-size:10px; color:var(--text-muted); font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:14px 8px 4px;">Importar</div>
+
+                <a href="{{ route('ibkr.index') }}" class="nav-link {{ request()->routeIs('ibkr.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    IBKR Import
                 </a>
-                <a href="{{ route('import.index') }}" class="nav-link {{ request()->routeIs('import.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
+                <a href="{{ route('import.index') }}" class="nav-link {{ request()->routeIs('import.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:1px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     Importar CSV
-                </a>
-                <a href="{{ route('ibkr.index') }}" class="nav-link {{ request()->routeIs('ibkr.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:2px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3" stroke="white" stroke-width="2" fill="none"/></svg>
-                    IBKR Import
                 </a>
             </nav>
 
