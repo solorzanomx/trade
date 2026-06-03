@@ -145,6 +145,60 @@
 </div>
 
 {{-- ═══════════════════════════════════════════
+     FILA 2B: CAPITAL SUMMARY
+═══════════════════════════════════════════ --}}
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:12px;">
+
+    {{-- Saldo Actual --}}
+    <div class="card" style="padding:18px 20px; border:1px solid {{ $accountCurrentBalance !== null ? 'rgba(59,130,246,.35)' : 'var(--border)' }};">
+        <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px;">Saldo en IBKR</div>
+        @if($accountCurrentBalance !== null)
+            <div style="font-size:26px; font-weight:800; color:var(--blue);">${{ number_format($accountCurrentBalance, 2) }}</div>
+            <div class="text-muted" style="font-size:11px; margin-top:3px;">Último ajuste registrado</div>
+        @else
+            <div style="font-size:20px; font-weight:700; color:var(--text-muted);">Sin registrar</div>
+            <a href="{{ route('account.index') }}" style="font-size:11px; color:var(--blue); text-decoration:none; margin-top:3px; display:block;">→ Registrar saldo actual</a>
+        @endif
+    </div>
+
+    {{-- Capital Neto --}}
+    <div class="card" style="padding:18px 20px;">
+        <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px;">Capital Neto Aportado</div>
+        @if($accountNetCapital > 0)
+            <div style="font-size:26px; font-weight:800; color:var(--text-primary);">${{ number_format($accountNetCapital, 2) }}</div>
+            <div class="text-muted" style="font-size:11px; margin-top:3px;">${{ number_format($accountDeposits,2) }} dep − ${{ number_format($accountWithdrawals,2) }} ret</div>
+        @else
+            <div style="font-size:20px; font-weight:700; color:var(--text-muted);">--</div>
+            <a href="{{ route('account.index') }}" style="font-size:11px; color:var(--blue); text-decoration:none; margin-top:3px; display:block;">→ Registrar depósitos</a>
+        @endif
+    </div>
+
+    {{-- P&L Neto --}}
+    <div class="card" style="padding:18px 20px;">
+        <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px;">P&L Neto de Trading</div>
+        <div style="font-size:26px; font-weight:800; {{ $accountNetPnl >= 0 ? 'color:var(--green)' : 'color:var(--red)' }};">
+            {{ $accountNetPnl >= 0 ? '+' : '' }}${{ number_format($accountNetPnl, 2) }}
+        </div>
+        <div class="text-muted" style="font-size:11px; margin-top:3px;">Ya incluye comisiones</div>
+    </div>
+
+    {{-- ROI --}}
+    <div class="card" style="padding:18px 20px;">
+        <div class="text-muted" style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px;">ROI sobre Capital</div>
+        @if($accountNetCapital > 0)
+            @php $roi = round(($accountNetPnl / $accountNetCapital) * 100, 2); @endphp
+            <div style="font-size:26px; font-weight:800; {{ $roi >= 0 ? 'color:var(--green)' : 'color:var(--red)' }};">
+                {{ $roi >= 0 ? '+' : '' }}{{ $roi }}%
+            </div>
+            <div class="text-muted" style="font-size:11px; margin-top:3px;">Retorno real sobre aportado</div>
+        @else
+            <div style="font-size:20px; font-weight:700; color:var(--text-muted);">--</div>
+            <div class="text-muted" style="font-size:11px; margin-top:3px;">Registra depósitos primero</div>
+        @endif
+    </div>
+</div>
+
+{{-- ═══════════════════════════════════════════
      FILA 3: AGENDA + NIVELES
 ═══════════════════════════════════════════ --}}
 @if($reportAgenda || $reportLevels || $reportSummary)

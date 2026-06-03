@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccountTransaction;
+use App\Models\Trade;
 use App\Services\TradingInsightsService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -77,6 +79,14 @@ class DashboardController extends Controller
             }
         }
 
+        // Capital summary
+        $accountDeposits    = AccountTransaction::totalDeposits($user->id);
+        $accountWithdrawals = AccountTransaction::totalWithdrawals($user->id);
+        $accountNetCapital  = $accountDeposits - $accountWithdrawals;
+        $accountNetPnl      = (float) Trade::where('user_id', $user->id)->where('status', 'closed')->sum('net_p_l');
+        $accountBalance     = AccountTransaction::where('user_id', $user->id)->where('type', 'adjustment')->orderByDesc('date')->orderByDesc('id')->first();
+        $accountCurrentBalance = $accountBalance ? (float) $accountBalance->amount : null;
+
         // Smart alerts + insights
         $plan     = $user->tradingPlan;
         $service  = new TradingInsightsService($user);
@@ -92,7 +102,9 @@ class DashboardController extends Controller
             'todayMetric', 'recentTrades', 'totalPnL', 'winRate',
             'todayNews', 'currentStreak', 'streakType',
             'todayReport', 'reportBias', 'reportAgenda', 'reportLevels', 'reportSummary',
-            'template', 'alerts', 'insights', 'todayJournal', 'plan'
+            'template', 'alerts', 'insights', 'todayJournal', 'plan',
+            'accountDeposits', 'accountWithdrawals', 'accountNetCapital',
+            'accountNetPnl', 'accountCurrentBalance'
         ));
     }
 

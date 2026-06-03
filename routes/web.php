@@ -10,6 +10,7 @@ use App\Http\Controllers\IBKRController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\TradingPlanController;
+use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -53,4 +54,9 @@ Route::middleware('auth')->group(function () {
     // Portafolio largo plazo
     Route::resource('portfolio', PortfolioController::class)->except(['show']);
     Route::post('/portfolio/{portfolioPosition}/price', [PortfolioController::class, 'updatePrice'])->name('portfolio.updatePrice');
+
+    // Gestión de capital (depósitos, retiros, saldo)
+    Route::get('/account', [AccountController::class, 'index'])->name('account.index');
+    Route::post('/account', [AccountController::class, 'store'])->name('account.store');
+    Route::delete('/account/{transaction}', [AccountController::class, 'destroy'])->name('account.destroy');
 });
