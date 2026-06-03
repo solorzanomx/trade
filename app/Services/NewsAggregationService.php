@@ -72,17 +72,21 @@ class NewsAggregationService
         }
 
         try {
-            $query = "Provide a concise summary of the latest news and market developments for {$asset->symbol} on {$date->format('Y-m-d')}. Include key points and overall sentiment.";
+            $query = "Dame un resumen conciso de las últimas noticias y movimientos de mercado para {$asset->symbol} ({$asset->name}) el {$date->format('d/m/Y')}. Incluye: catalizadores clave, sentimiento del mercado, y si hay eventos relevantes (earnings, FDA, macro). Máximo 3 puntos clave.";
 
             $response = Http::timeout(30)
-                ->withHeaders(['Authorization' => "Bearer {$this->perplexityKey}"])
-                ->post('https://api.perplexity.ai/openai/deployments/pplx-7b-online/chat/completions', [
-                    'model' => 'pplx-7b-online',
+                ->withHeaders([
+                    'Authorization' => "Bearer {$this->perplexityKey}",
+                    'Content-Type'  => 'application/json',
+                ])
+                ->post('https://api.perplexity.ai/chat/completions', [
+                    'model' => 'sonar',
                     'messages' => [
+                        ['role' => 'system', 'content' => 'Eres un analista financiero experto. Responde siempre en español. Sé conciso y directo.'],
                         ['role' => 'user', 'content' => $query],
                     ],
-                    'temperature' => 0.7,
-                    'max_tokens' => 500,
+                    'temperature' => 0.2,
+                    'max_tokens' => 600,
                 ]);
 
             if ($response->successful()) {
@@ -114,7 +118,7 @@ class NewsAggregationService
         }
 
         try {
-            $query = "Summarize the latest news about {$asset->symbol} as of {$date->format('Y-m-d')}. Include key market developments and sentiment. Keep it concise.";
+            $query = "Resume las últimas noticias sobre {$asset->symbol} ({$asset->name}) al {$date->format('d/m/Y')}. Incluye catalizadores clave, sentimiento del mercado y eventos relevantes. Sé conciso, máximo 3 puntos.";
 
             $response = Http::timeout(30)
                 ->withHeaders([

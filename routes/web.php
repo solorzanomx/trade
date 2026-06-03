@@ -21,6 +21,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/metrics', [MetricsController::class, 'index'])->name('metrics.index');
 
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+    Route::post('/news/generate', [NewsController::class, 'generate'])->name('news.generate');
+    Route::delete('/news/{id}', [NewsController::class, 'destroy'])->name('news.destroy');
 
     Route::get('/import', [ImportController::class, 'index'])->name('import.index');
     Route::post('/import', [ImportController::class, 'store'])->name('import.store');
